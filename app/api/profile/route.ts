@@ -44,6 +44,7 @@ export async function PATCH(req: NextRequest) {
       await dbConnect();
       const user = await User.findById(session.user.id);
       if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      if (!user.password) return NextResponse.json({ error: 'Google accounts cannot change password here' }, { status: 400 });
 
       const isMatch = await bcrypt.compare(oldPassword, user.password);
       if (!isMatch) {
