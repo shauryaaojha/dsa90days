@@ -2,10 +2,11 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IUser extends Document {
   email: string;
-  password: string;
+  password: string | null;
   name: string;
   createdAt: Date;
   pledgeAcceptedAt: Date | null;
+  provider: 'credentials' | 'google';
 }
 
 const UserSchema = new Schema<IUser>({
@@ -18,13 +19,17 @@ const UserSchema = new Schema<IUser>({
   },
   password: {
     type: String,
-    required: [true, 'Password is required'],
-    minlength: [6, 'Password must be at least 6 characters'],
+    default: null,
   },
   name: {
     type: String,
     required: [true, 'Name is required'],
     trim: true,
+  },
+  provider: {
+    type: String,
+    enum: ['credentials', 'google'],
+    default: 'credentials',
   },
   createdAt: {
     type: Date,
