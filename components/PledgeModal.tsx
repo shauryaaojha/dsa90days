@@ -62,12 +62,24 @@ export default function PledgeModal({ userName, onAccepted }: Props) {
           <p className="pledge-ref">— Bhagavad Gita, Chapter 2 · Verse 3</p>
         </div>
 
-        {/* What this means */}
+        {/* Why this verse */}
+        <div className="pledge-alignment">
+          <p className="pledge-alignment-heading">
+            <i className="ti ti-bulb" style={{ fontSize: '13px' }}></i>
+            Why this verse?
+          </p>
+          <p className="pledge-alignment-text">
+            Krishna says this to Arjuna at the moment he wants to quit — overwhelmed, doubting himself, ready to walk away from the battle.
+            Sound familiar? That&apos;s exactly what DSA prep feels like. You open LeetCode, see a hard problem, and your brain says <em>&ldquo;I&apos;m not built for this.&rdquo;</em>
+            <br /><br />
+            This verse is a direct answer to that feeling. The word <strong>uttishtha</strong> (उत्तिष्ठ) means <strong>arise</strong> — not &ldquo;try&rdquo;, not &ldquo;consider it&rdquo;. Arise. Open the problem. Read it once. That&apos;s all the Gita asks of you today.
+          </p>
+        </div>
+
+        {/* Commitment block */}
         <div className="pledge-commitment">
           <p>
-            You are about to commit to <strong>90 days</strong> of structured DSA practice.
-            Your journey starts <strong>today</strong> — the calendar begins the moment you accept.
-            Each day counts whether you solve problems or not. Show up.
+            You are about to commit to <strong>90 days</strong> of structured DSA practice — 200+ problems, one day at a time. Your <strong>90-day clock starts today</strong> the moment you accept. The calendar runs whether you open the app or not. Show up anyway.
           </p>
         </div>
 
