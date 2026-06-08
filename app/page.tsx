@@ -230,7 +230,7 @@ export default function DashboardPage() {
   const strokeDashoffset = strokeDasharray - (strokeDasharray * percentage) / 100;
 
   return (
-    <div className="wrap-bento page-container" style={{ padding: '1.5rem 1.5rem 3rem' }}>
+    <div className="wrap-bento page-container" style={{ padding: '1.75rem 1.5rem 4rem' }}>
       
       {/* Bento Grid */}
       <div className="bento-grid animate-fade-in stagger-children">
@@ -239,52 +239,33 @@ export default function DashboardPage() {
         <div className="bento-card card-hero-bento">
           <div className="hero-top-bento">
             <span className="hero-title-bento">
-              <i className="ti ti-rocket" aria-hidden="true" style={{ fontSize: '18px' }}></i> 
-              DSA Mastery Dashboard
+              <i className="ti ti-rocket" aria-hidden="true" style={{ fontSize: '16px' }}></i>
+              Your Progress
             </span>
             <div className="streak-badge-bento">
-              <i className="ti ti-flame" aria-hidden="true"></i> 
-              {currentStreak}-day streak
+              <i className="ti ti-flame" aria-hidden="true"></i>
+              {currentStreak} day streak
             </div>
           </div>
-          
+
           <div className="progress-ring-wrap-bento">
-            <svg width="110" height="110" viewBox="0 0 110 110">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#f0dfd9" strokeWidth="9" />
               <circle
-                cx="55"
-                cy="55"
-                r="44"
-                fill="none"
-                stroke="#f0dfd9"
-                strokeWidth="8"
-              />
-              <circle
-                cx="55"
-                cy="55"
-                r="44"
-                fill="none"
-                stroke="#944521"
-                strokeWidth="8"
-                strokeDasharray={strokeDasharray}
-                strokeDashoffset={strokeDashoffset}
+                cx="60" cy="60" r="50" fill="none" stroke="#944521" strokeWidth="9"
+                strokeDasharray="314.16"
+                strokeDashoffset={314.16 - (314.16 * percentage) / 100}
                 strokeLinecap="round"
-                transform="rotate(-90 55 55)"
+                transform="rotate(-90 60 60)"
+                style={{ transition: 'stroke-dashoffset 1s ease' }}
               />
-              <text x="55" y="50" textAnchor="middle" fontSize="22" fontWeight="700" fill="#944521">
-                {totalCompleted}
-              </text>
-              <text x="55" y="66" textAnchor="middle" fontSize="10" fontWeight="500" fill="#88726b">
-                of {totalProblems}
-              </text>
+              <text x="60" y="55" textAnchor="middle" fontSize="24" fontWeight="800" fill="#944521">{percentage}%</text>
+              <text x="60" y="72" textAnchor="middle" fontSize="11" fontWeight="500" fill="#88726b">{totalCompleted} / {totalProblems}</text>
             </svg>
-            
+
             <div className="ring-divider-bento"></div>
-            
+
             <div className="ring-stats-bento">
-              <div className="ring-stat-bento">
-                <span className="ring-stat-val-bento">{percentage}%</span>
-                <span className="ring-stat-lbl-bento">Completion</span>
-              </div>
               <div className="ring-stat-bento">
                 <span className="ring-stat-val-bento">Day {todayDay}</span>
                 <span className="ring-stat-lbl-bento">Current day</span>
@@ -293,6 +274,27 @@ export default function DashboardPage() {
                 <span className="ring-stat-val-bento">{completedDays.size}</span>
                 <span className="ring-stat-lbl-bento">Days active</span>
               </div>
+              <div className="ring-stat-bento">
+                <span className="ring-stat-val-bento">{90 - todayDay}</span>
+                <span className="ring-stat-lbl-bento">Days left</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="hero-week-strip-bento">
+            <div className="hero-week-item-bento">
+              <i className="ti ti-calendar-week" style={{ fontSize: '13px', color: 'var(--primary)' }}></i>
+              <span>Week {todayWeek.week}</span>
+            </div>
+            <div className="hero-week-sep-bento"></div>
+            <div className="hero-week-item-bento">
+              <i className="ti ti-book-2" style={{ fontSize: '13px', color: 'var(--primary)' }}></i>
+              <span>{todayWeek.topic}</span>
+            </div>
+            <div className="hero-week-sep-bento"></div>
+            <div className="hero-week-item-bento">
+              <i className="ti ti-clock" style={{ fontSize: '13px', color: 'var(--primary)' }}></i>
+              <span>{todayWeek.dayRange}</span>
             </div>
           </div>
         </div>
@@ -448,14 +450,12 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* 5. Mini Stats Widgets (span 1 each) */}
+        {/* 5. Mini Stats Widgets (span 1 each) — 4 cards fill the row */}
         <div className="bento-card card-mini-bento card-premium-purple">
           <div className="mini-icon-bento">
             <i className="ti ti-target" style={{ fontSize: '15px' }} aria-hidden="true"></i>
           </div>
-          <span className="mini-val-bento">
-            {totalProblems}
-          </span>
+          <span className="mini-val-bento">{totalProblems}</span>
           <span className="mini-lbl-bento">Total problems</span>
         </div>
 
@@ -463,10 +463,24 @@ export default function DashboardPage() {
           <div className="mini-icon-bento">
             <i className="ti ti-award" style={{ fontSize: '15px' }} aria-hidden="true"></i>
           </div>
-          <span className="mini-val-bento">
-            {patterns.length}
-          </span>
-          <span className="mini-lbl-bento">Patterns to learn</span>
+          <span className="mini-val-bento">{patterns.length}</span>
+          <span className="mini-lbl-bento">Patterns</span>
+        </div>
+
+        <div className="bento-card card-mini-bento" style={{ background: '#fef3e2', borderColor: '#fcd9a0' }}>
+          <div className="mini-icon-bento" style={{ background: 'rgba(201,114,21,0.12)', color: '#c97215' }}>
+            <i className="ti ti-flame" style={{ fontSize: '15px' }} aria-hidden="true"></i>
+          </div>
+          <span className="mini-val-bento">{currentStreak}</span>
+          <span className="mini-lbl-bento">Day streak</span>
+        </div>
+
+        <div className="bento-card card-mini-bento" style={{ background: 'var(--surface-container-low)', borderColor: 'var(--outline-variant)' }}>
+          <div className="mini-icon-bento">
+            <i className="ti ti-calendar-check" style={{ fontSize: '15px' }} aria-hidden="true"></i>
+          </div>
+          <span className="mini-val-bento">{90 - todayDay}</span>
+          <span className="mini-lbl-bento">Days remaining</span>
         </div>
 
         {/* 6. Phase Cards (span 2 each) */}
@@ -547,9 +561,6 @@ export default function DashboardPage() {
 
       </div>
       
-      <p className="label-note-bento">
-        Redesign concept — Bento Grid layout with semantic color coding and interactive daily checklist
-      </p>
     </div>
   );
 }

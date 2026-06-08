@@ -42,12 +42,17 @@ export default function LoginPage() {
       <div className="auth-split-left">
         <div className="auth-brand-panel">
           <div className="auth-brand-logo">
-            <i className="ti ti-code" style={{ fontSize: '22px' }}></i>
+            <div className="auth-brand-logo-icon">
+              <i className="ti ti-code" style={{ fontSize: '18px' }}></i>
+            </div>
             <span>DSA Tracker</span>
           </div>
+
           <div className="auth-brand-body">
-            <h2 className="auth-brand-heading">Back to the grind.</h2>
-            <p className="auth-brand-sub">Your progress is waiting. Every day you practice, you compound your edge over the competition.</p>
+            <h2 className="auth-brand-heading">Back to<br />the grind.</h2>
+            <p className="auth-brand-sub">
+              Your progress is waiting. Every day you practice, you compound your edge over the competition.
+            </p>
             <div className="auth-brand-stats">
               <div className="auth-brand-stat">
                 <span className="auth-brand-stat-num">200+</span>
@@ -55,16 +60,32 @@ export default function LoginPage() {
               </div>
               <div className="auth-brand-stat">
                 <span className="auth-brand-stat-num">90</span>
-                <span className="auth-brand-stat-lbl">Day Plan</span>
+                <span className="auth-brand-stat-lbl">Days</span>
               </div>
               <div className="auth-brand-stat">
                 <span className="auth-brand-stat-num">20</span>
                 <span className="auth-brand-stat-lbl">Patterns</span>
               </div>
             </div>
+
+            <div className="auth-deco-cards">
+              <div className="auth-deco-card">
+                <div className="auth-deco-dot green"></div>
+                <span className="auth-deco-card-text">twoSum(nums, target) → O(n)</span>
+              </div>
+              <div className="auth-deco-card">
+                <div className="auth-deco-dot orange"></div>
+                <span className="auth-deco-card-text">BFS: queue + visited set</span>
+              </div>
+              <div className="auth-deco-card">
+                <div className="auth-deco-dot red"></div>
+                <span className="auth-deco-card-text">dp[i] = dp[i-1] + dp[i-2]</span>
+              </div>
+            </div>
           </div>
+
           <div className="auth-brand-quote">
-            &ldquo;कर्मण्येवाधिकारस्ते मा फलेषु कदाचन&rdquo;
+            &ldquo;कर्मण्येवाधिकारस्ते मा फलेषु कदाचन&rdquo; — Bhagavad Gita, 2:47
           </div>
         </div>
       </div>

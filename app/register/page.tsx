@@ -83,21 +83,50 @@ export default function RegisterPage() {
       <div className="auth-split-left">
         <div className="auth-brand-panel">
           <div className="auth-brand-logo">
-            <i className="ti ti-code" style={{ fontSize: '22px' }}></i>
+            <div className="auth-brand-logo-icon">
+              <i className="ti ti-code" style={{ fontSize: '18px' }}></i>
+            </div>
             <span>DSA Tracker</span>
           </div>
+
           <div className="auth-brand-body">
-            <h2 className="auth-brand-heading">Start your 90-day journey.</h2>
-            <p className="auth-brand-sub">Join engineers who&apos;ve structured their prep and landed top-tier offers. Free, always.</p>
+            <h2 className="auth-brand-heading">Start your<br />90-day journey.</h2>
+            <p className="auth-brand-sub">
+              Join engineers who&apos;ve structured their prep and landed top-tier offers. Free, always.
+            </p>
             <div className="auth-brand-checklist">
-              <div className="auth-brand-check-item"><i className="ti ti-check"></i> 200+ curated LeetCode problems</div>
-              <div className="auth-brand-check-item"><i className="ti ti-check"></i> Daily progress tracking &amp; streaks</div>
-              <div className="auth-brand-check-item"><i className="ti ti-check"></i> 20 essential algorithm patterns</div>
-              <div className="auth-brand-check-item"><i className="ti ti-check"></i> Video solutions &amp; curated resources</div>
+              <div className="auth-brand-check-item">
+                <i className="ti ti-check"></i>
+                200+ curated LeetCode problems
+              </div>
+              <div className="auth-brand-check-item">
+                <i className="ti ti-check"></i>
+                Daily progress tracking &amp; streaks
+              </div>
+              <div className="auth-brand-check-item">
+                <i className="ti ti-check"></i>
+                20 essential algorithm patterns
+              </div>
+              <div className="auth-brand-check-item">
+                <i className="ti ti-check"></i>
+                Video solutions &amp; curated resources
+              </div>
+            </div>
+
+            <div className="auth-deco-cards" style={{ marginTop: '28px' }}>
+              <div className="auth-deco-card">
+                <div className="auth-deco-dot green"></div>
+                <span className="auth-deco-card-text">Sliding Window → O(n)</span>
+              </div>
+              <div className="auth-deco-card">
+                <div className="auth-deco-dot orange"></div>
+                <span className="auth-deco-card-text">Two Pointers → O(n)</span>
+              </div>
             </div>
           </div>
+
           <div className="auth-brand-quote">
-            &ldquo;कर्मण्येवाधिकारस्ते मा फलेषु कदाचन&rdquo;
+            &ldquo;कर्मण्येवाधिकारस्ते मा फलेषु कदाचन&rdquo; — Bhagavad Gita, 2:47
           </div>
         </div>
       </div>
@@ -151,39 +180,38 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <div className="auth-field-row">
-              <div className="auth-field">
-                <label className="auth-field-label" htmlFor="register-password">Password</label>
-                <div className="auth-input-wrap">
-                  <i className="ti ti-lock auth-input-icon"></i>
-                  <input
-                    id="register-password"
-                    className="auth-input"
-                    type="password"
-                    placeholder="Min. 6 chars"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={6}
-                    autoComplete="new-password"
-                  />
-                </div>
+            <div className="auth-field">
+              <label className="auth-field-label" htmlFor="register-password">Password</label>
+              <div className="auth-input-wrap">
+                <i className="ti ti-lock auth-input-icon"></i>
+                <input
+                  id="register-password"
+                  className="auth-input"
+                  type="password"
+                  placeholder="Min. 6 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                />
               </div>
-              <div className="auth-field">
-                <label className="auth-field-label" htmlFor="register-confirm">Confirm</label>
-                <div className="auth-input-wrap">
-                  <i className="ti ti-lock-check auth-input-icon"></i>
-                  <input
-                    id="register-confirm"
-                    className="auth-input"
-                    type="password"
-                    placeholder="Re-enter"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                    autoComplete="new-password"
-                  />
-                </div>
+            </div>
+
+            <div className="auth-field">
+              <label className="auth-field-label" htmlFor="register-confirm">Confirm Password</label>
+              <div className="auth-input-wrap">
+                <i className="ti ti-lock-check auth-input-icon"></i>
+                <input
+                  id="register-confirm"
+                  className="auth-input"
+                  type="password"
+                  placeholder="Re-enter your password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  autoComplete="new-password"
+                />
               </div>
             </div>
 

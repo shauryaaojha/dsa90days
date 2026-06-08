@@ -3,12 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { useState } from 'react';
 
 export default function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const [menuOpen, setMenuOpen] = useState(false);
 
   if (!session) return null;
 
@@ -20,28 +18,22 @@ export default function Navbar() {
     { href: '/resources', label: 'Resources' },
   ];
 
-  // Get dynamic initials for the mockup avatar
   const userName = session.user?.name || 'User';
   const initials = userName
     .split(' ')
-    .map((n) => n[0])
+    .map((n: string) => n[0])
     .join('')
     .substring(0, 2)
     .toUpperCase();
 
   return (
-    <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 1.5rem' }}>
+    <header className="navbar-wrap">
       <nav className="navbar-dock animate-fade-in">
-        <Link href="/" className="nav-logo-dock" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-          <div style={{
-            width: '30px', height: '30px', borderRadius: '8px',
-            background: 'var(--primary)', color: 'white',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '14px', flexShrink: 0,
-          }}>
-            <i className="ti ti-code" style={{ fontSize: '16px' }}></i>
+        <Link href="/" className="nav-logo-dock" style={{ textDecoration: 'none' }}>
+          <div className="logo-icon-dock">
+            <i className="ti ti-code" style={{ fontSize: '17px' }}></i>
           </div>
-          <span className="logo-text-dock">DSA Tracker</span>
+          <span className="logo-text-dock">DSA <span>Tracker</span></span>
         </Link>
 
         <div className="nav-links-dock">
@@ -57,16 +49,18 @@ export default function Navbar() {
         </div>
 
         <div className="nav-user-dock">
-          <div className="avatar-dock">{initials}</div>
-          <span style={{ fontWeight: 500 }} className="navbar-user-name-dock">{userName}</span>
+          <Link href="/profile" className="avatar-dock" title="My Profile">
+            {initials}
+          </Link>
           <button
             className="btn-logout-dock"
             onClick={() => signOut({ callbackUrl: '/login' })}
           >
-            Logout
+            <i className="ti ti-logout" style={{ fontSize: '13px' }}></i>
+            Sign out
           </button>
         </div>
       </nav>
-    </div>
+    </header>
   );
 }
