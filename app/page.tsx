@@ -1,0 +1,703 @@
+'use client';
+
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { problems } from '@/data/problems';
+import { weeks } from '@/data/weeks';
+import { patterns } from '@/data/patterns';
+
+interface ProgressEntry {
+  problemId: string;
+  completed: boolean;
+  notes: string;
+  completedAt: string | null;
+}
+
+export default function DashboardPage() {
+  const { data: session, status } = useSession();
+  const [progress, setProgress] = useState<ProgressEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (session) {
+      fetchProgress();
+    } else if (status === 'unauthenticated') {
+      setLoading(false);
+    }
+  }, [session, status]);
+
+  const fetchProgress = async () => {
+    try {
+      const res = await fetch('/api/progress');
+      const data = await res.json();
+      setProgress(data.progress || []);
+    } catch (err) {
+      console.error('Failed to fetch progress:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleProblem = async (problemId: string, currentStatus: boolean) => {
+    try {
+      // Optimistic state update for instant Gen Z responsive feedback
+      setProgress((prev) => {
+        const exists = prev.some((p) => p.problemId === problemId);
+        if (exists) {
+          return prev.map((p) =>
+            p.problemId === problemId
+              ? {
+                  ...p,
+                  completed: !currentStatus,
+                  completedAt: !currentStatus ? new Date().toISOString() : null,
+                }
+              : p
+          );
+        } else {
+          return [
+            ...prev,
+            {
+              problemId,
+              completed: !currentStatus,
+              notes: '',
+              completedAt: !currentStatus ? new Date().toISOString() : null,
+            },
+          ];
+        }
+      });
+
+      const res = await fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          problemId,
+          completed: !currentStatus,
+        }),
+      });
+
+      if (!res.ok) {
+        fetchProgress(); // Revert on failure
+      }
+    } catch (err) {
+      console.error('Failed to toggle problem progress:', err);
+      fetchProgress(); // Revert on failure
+    }
+  };
+
+  if (status === 'loading' || (session && loading)) {
+    return (
+      <div className="loading-spinner">
+        <div className="spinner" />
+      </div>
+    );
+  }
+
+  if (status === 'unauthenticated' || !session) {
+    return <LandingPage />;
+  }
+
+  const completedIds = new Set(progress.filter((p) => p.completed).map((p) => p.problemId));
+  const totalProblems = problems.length;
+  const totalCompleted = completedIds.size;
+  const percentage = totalProblems > 0 ? Math.round((totalCompleted / totalProblems) * 100) : 0;
+
+  const phase1Problems = problems.filter((p) => p.phase === 1);
+  const phase2Problems = problems.filter((p) => p.phase === 2);
+  const phase1Completed = phase1Problems.filter((p) => completedIds.has(p.id)).length;
+  const phase2Completed = phase2Problems.filter((p) => completedIds.has(p.id)).length;
+
+  const easyProblems = problems.filter((p) => p.difficulty === 'Easy');
+  const mediumProblems = problems.filter((p) => p.difficulty === 'Medium');
+  const hardProblems = problems.filter((p) => p.difficulty === 'Hard');
+  const easyCompleted = easyProblems.filter((p) => completedIds.has(p.id)).length;
+  const mediumCompleted = mediumProblems.filter((p) => completedIds.has(p.id)).length;
+  const hardCompleted = hardProblems.filter((p) => completedIds.has(p.id)).length;
+
+  const completedDays = new Set(
+    problems.filter((p) => completedIds.has(p.id)).map((p) => p.day)
+  );
+
+  // Dynamic today's learning day calculation: Smallest day with uncompleted problems
+  let todayDay = 1;
+  for (let d = 1; d <= 90; d++) {
+    const dayProbs = problems.filter((p) => p.day === d);
+    if (dayProbs.length > 0) {
+      const allDone = dayProbs.every((p) => completedIds.has(p.id));
+      if (!allDone) {
+        todayDay = d;
+        break;
+      }
+    }
+  }
+
+  // Today's questions list
+  const todaysQuestions = problems.filter((p) => p.day === todayDay);
+
+  // Find today's week information
+  const todayWeek =
+    weeks.find((w) => {
+      const match = w.dayRange.match(/Day\s+(\d+)[^\d]+(\d+)/i);
+      if (match) {
+        const start = parseInt(match[1], 10);
+        const end = parseInt(match[2], 10);
+        return todayDay >= start && todayDay <= end;
+      }
+      return false;
+    }) || weeks[0];
+
+  // Dynamic streak calculator
+  const calculateStreak = () => {
+    const completedDates = progress
+      .filter((p) => p.completed && p.completedAt)
+      .map((p) => new Date(p.completedAt!).toLocaleDateString('en-CA')) // 'YYYY-MM-DD'
+      .filter((value, index, self) => self.indexOf(value) === index); // unique dates
+
+    if (completedDates.length === 0) return 0;
+
+    const datesSet = new Set(completedDates);
+    let streak = 0;
+    const checkDate = new Date();
+
+    const todayStr = checkDate.toLocaleDateString('en-CA');
+    if (datesSet.has(todayStr)) {
+      streak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+      while (datesSet.has(checkDate.toLocaleDateString('en-CA'))) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      }
+    } else {
+      checkDate.setDate(checkDate.getDate() - 1);
+      const yesterdayStr = checkDate.toLocaleDateString('en-CA');
+      if (datesSet.has(yesterdayStr)) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+        while (datesSet.has(checkDate.toLocaleDateString('en-CA'))) {
+          streak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        }
+      }
+    }
+    return streak;
+  };
+  const currentStreak = calculateStreak();
+
+  // Streak grid generating (3 rows of 7 days) Monday-Sunday
+  const getStreakGrid = () => {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 Sun, 1 Mon, ... 6 Sat
+    const distanceToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const mondayOfThisWeek = new Date(today);
+    mondayOfThisWeek.setDate(today.getDate() - distanceToMonday);
+
+    const gridStart = new Date(mondayOfThisWeek);
+    gridStart.setDate(mondayOfThisWeek.getDate() - 14);
+
+    const completedDates = new Set(
+      progress
+        .filter((p) => p.completed && p.completedAt)
+        .map((p) => new Date(p.completedAt!).toLocaleDateString('en-CA'))
+    );
+
+    const todayStr = today.toLocaleDateString('en-CA');
+
+    const gridCells = [];
+    for (let i = 0; i < 21; i++) {
+      const cellDate = new Date(gridStart);
+      cellDate.setDate(gridStart.getDate() + i);
+      const cellStr = cellDate.toLocaleDateString('en-CA');
+
+      let type: 'empty' | 'done' | 'today' = 'empty';
+      if (cellStr === todayStr) {
+        type = 'today';
+      } else if (completedDates.has(cellStr)) {
+        type = 'done';
+      }
+      gridCells.push({ date: cellDate, type });
+    }
+    return gridCells;
+  };
+  const streakGrid = getStreakGrid();
+
+  const easyPct = easyProblems.length > 0 ? Math.round((easyCompleted / easyProblems.length) * 100) : 0;
+  const medPct = mediumProblems.length > 0 ? Math.round((mediumCompleted / mediumProblems.length) * 100) : 0;
+  const hardPct = hardProblems.length > 0 ? Math.round((hardCompleted / hardProblems.length) * 100) : 0;
+
+  // SVG circular progress ring calculations
+  const strokeDasharray = 276.5;
+  const strokeDashoffset = strokeDasharray - (strokeDasharray * percentage) / 100;
+
+  return (
+    <div className="wrap-bento page-container" style={{ padding: '1.5rem 1.5rem 3rem' }}>
+      
+      {/* Bento Grid */}
+      <div className="bento-grid animate-fade-in stagger-children">
+        
+        {/* 1. Hero progress card (2x2) */}
+        <div className="bento-card card-hero-bento">
+          <div className="hero-top-bento">
+            <span className="hero-title-bento">
+              <i className="ti ti-rocket" aria-hidden="true" style={{ fontSize: '18px' }}></i> 
+              DSA Mastery Dashboard
+            </span>
+            <div className="streak-badge-bento">
+              <i className="ti ti-flame" aria-hidden="true"></i> 
+              {currentStreak}-day streak
+            </div>
+          </div>
+          
+          <div className="progress-ring-wrap-bento">
+            <svg width="110" height="110" viewBox="0 0 110 110">
+              <circle
+                cx="55"
+                cy="55"
+                r="44"
+                fill="none"
+                stroke="#f0dfd9"
+                strokeWidth="8"
+              />
+              <circle
+                cx="55"
+                cy="55"
+                r="44"
+                fill="none"
+                stroke="#944521"
+                strokeWidth="8"
+                strokeDasharray={strokeDasharray}
+                strokeDashoffset={strokeDashoffset}
+                strokeLinecap="round"
+                transform="rotate(-90 55 55)"
+              />
+              <text x="55" y="50" textAnchor="middle" fontSize="22" fontWeight="700" fill="#944521">
+                {totalCompleted}
+              </text>
+              <text x="55" y="66" textAnchor="middle" fontSize="10" fontWeight="500" fill="#88726b">
+                of {totalProblems}
+              </text>
+            </svg>
+            
+            <div className="ring-divider-bento"></div>
+            
+            <div className="ring-stats-bento">
+              <div className="ring-stat-bento">
+                <span className="ring-stat-val-bento">{percentage}%</span>
+                <span className="ring-stat-lbl-bento">Completion</span>
+              </div>
+              <div className="ring-stat-bento">
+                <span className="ring-stat-val-bento">Day {todayDay}</span>
+                <span className="ring-stat-lbl-bento">Current day</span>
+              </div>
+              <div className="ring-stat-bento">
+                <span className="ring-stat-val-bento">{completedDays.size}</span>
+                <span className="ring-stat-lbl-bento">Days active</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 2. Streak Card (2x1) */}
+        <div className="bento-card card-streak-bento">
+          <div className="streak-title-bento">
+            <i className="ti ti-calendar-stats" aria-hidden="true" style={{ fontSize: '15px' }}></i>
+            Weekly activity — last 3 weeks
+          </div>
+          <div className="streak-grid-bento">
+            {streakGrid.map((cell, idx) => (
+              <div 
+                key={idx} 
+                className={`streak-cell-bento ${cell.type}`}
+                title={cell.date.toDateString()}
+              />
+            ))}
+          </div>
+          <div className="streak-days-bento">
+            <span className="streak-day-bento">Mon</span>
+            <span className="streak-day-bento">Tue</span>
+            <span className="streak-day-bento">Wed</span>
+            <span className="streak-day-bento">Thu</span>
+            <span className="streak-day-bento">Fri</span>
+            <span className="streak-day-bento">Sat</span>
+            <span className="streak-day-bento">Sun</span>
+          </div>
+        </div>
+
+        {/* 3. Difficulty Card (2x1) */}
+        <div className="bento-card card-diff-bento">
+          <div className="diff-title-bento">
+            <i className="ti ti-chart-bar" aria-hidden="true" style={{ fontSize: '15px' }}></i>
+            Difficulty breakdown
+          </div>
+          <div className="diff-bars-bento">
+            <div className="diff-row-bento">
+              <span className="diff-label-bento easy-label-bento">Easy</span>
+              <div className="diff-track-bento">
+                <div className="diff-fill-bento easy-fill-bento" style={{ width: `${easyPct}%` }}></div>
+              </div>
+              <span className="diff-count-bento">
+                {easyCompleted}/{easyProblems.length}
+              </span>
+            </div>
+            <div className="diff-row-bento">
+              <span className="diff-label-bento med-label-bento">Medium</span>
+              <div className="diff-track-bento">
+                <div className="diff-fill-bento med-fill-bento" style={{ width: `${medPct}%` }}></div>
+              </div>
+              <span className="diff-count-bento">
+                {mediumCompleted}/{mediumProblems.length}
+              </span>
+            </div>
+            <div className="diff-row-bento">
+              <span className="diff-label-bento hard-label-bento">Hard</span>
+              <div className="diff-track-bento">
+                <div className="diff-fill-bento hard-fill-bento" style={{ width: `${hardPct}%` }}></div>
+              </div>
+              <span className="diff-count-bento">
+                {hardCompleted}/{hardProblems.length}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* 4. Today's Tasks Card (span 2) */}
+        <div className="bento-card card-today-bento">
+          <div className="today-header-bento">
+            <span className="today-title-bento">
+              <i className="ti ti-list-check" aria-hidden="true" style={{ fontSize: '15px' }}></i>
+              Today's questions — Day {todayDay}
+            </span>
+            <span className="today-day-bento">
+              Week {todayWeek.week} · {todayWeek.topic}
+            </span>
+          </div>
+          
+          <div className="task-list-bento">
+            {todaysQuestions.length > 0 ? (
+              todaysQuestions.map((q) => {
+                const isCompleted = completedIds.has(q.id);
+                return (
+                  <div key={q.id} className={`task-row-bento ${isCompleted ? 'completed' : ''}`}>
+                    <input 
+                      type="checkbox" 
+                      className="task-check-bento" 
+                      checked={isCompleted}
+                      onChange={() => toggleProblem(q.id, isCompleted)}
+                    />
+                    <span className="task-name-bento">{q.name}</span>
+                    
+                    <span className={`task-diff-bento ${
+                      q.difficulty === 'Easy' ? 't-easy-bento' : q.difficulty === 'Medium' ? 't-med-bento' : 't-hard-bento'
+                    }`}>
+                      {q.difficulty}
+                    </span>
+                    
+                    {q.videos?.striver && (
+                      <a
+                        href={q.videos.striver}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="task-lc-bento"
+                        title="Striver Solution"
+                      >
+                        <i className="ti ti-brand-youtube" style={{ fontSize: '11px' }}></i>
+                        <span>Striver</span>
+                      </a>
+                    )}
+                    {q.videos?.apnaCollege && (
+                      <a
+                        href={q.videos.apnaCollege}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="task-lc-bento"
+                        title="Apna College Solution"
+                      >
+                        <i className="ti ti-brand-youtube" style={{ fontSize: '11px' }}></i>
+                        <span>Apna</span>
+                      </a>
+                    )}
+                    {q.videos?.padhoPratyush && (
+                      <a
+                        href={q.videos.padhoPratyush}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="task-lc-bento"
+                        title="Padho w Pratyush Solution"
+                      >
+                        <i className="ti ti-brand-youtube" style={{ fontSize: '11px' }}></i>
+                        <span>Pratyush</span>
+                      </a>
+                    )}
+                    <a
+                      href={q.leetcodeLink || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="task-lc-bento"
+                    >
+                      <i className="ti ti-external-link" style={{ fontSize: '11px' }}></i>
+                      <span>Solve</span>
+                    </a>
+                  </div>
+                );
+              })
+            ) : (
+              <div style={{ fontSize: '13px', color: 'var(--secondary)', fontWeight: 600, textAlign: 'center', padding: '12px' }}>
+                All problems completed — keep going!
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 5. Mini Stats Widgets (span 1 each) */}
+        <div className="bento-card card-mini-bento card-premium-purple">
+          <div className="mini-icon-bento">
+            <i className="ti ti-target" style={{ fontSize: '15px' }} aria-hidden="true"></i>
+          </div>
+          <span className="mini-val-bento">
+            {totalProblems}
+          </span>
+          <span className="mini-lbl-bento">Total problems</span>
+        </div>
+
+        <div className="bento-card card-mini-bento card-premium-green">
+          <div className="mini-icon-bento">
+            <i className="ti ti-award" style={{ fontSize: '15px' }} aria-hidden="true"></i>
+          </div>
+          <span className="mini-val-bento">
+            {patterns.length}
+          </span>
+          <span className="mini-lbl-bento">Patterns to learn</span>
+        </div>
+
+        {/* 6. Phase Cards (span 2 each) */}
+        <div className="bento-card card-phase-bento card-premium-purple">
+          <div className="phase-header-bento">
+            <span className="phase-badge-bento p1-badge-bento">Phase 1</span>
+            <span className="phase-days-bento">Day 1–60</span>
+          </div>
+          <div className="phase-title-bento">Core DS & Algorithms</div>
+          <div className="phase-sub-bento">Arrays → Trees → BST → Heaps</div>
+          
+          <div className="phase-progress-row-bento">
+            <div className="phase-track-bento">
+              <div 
+                className="p1-fill-bento" 
+                style={{ width: `${phase1Problems.length > 0 ? (phase1Completed / phase1Problems.length) * 100 : 0}%` }}
+              />
+            </div>
+            <span className="phase-pct-bento p1-pct-bento">
+              {phase1Problems.length > 0 ? Math.round((phase1Completed / phase1Problems.length) * 100) : 0}%
+            </span>
+          </div>
+          
+          <div className="phase-counts-bento">
+            {phase1Completed} / {phase1Problems.length} problems
+          </div>
+          
+          <Link href="/phase/1" style={{ textDecoration: 'none' }}>
+            <button className="phase-btn-bento">
+              <i className="ti ti-player-play" style={{ fontSize: '13px' }} aria-hidden="true"></i>
+              {phase1Completed > 0 ? 'Continue Phase 1' : 'Start Phase 1'}
+            </button>
+          </Link>
+        </div>
+
+        <div className={`bento-card card-phase-bento ${phase1Completed >= phase1Problems.length ? 'card-premium-green' : ''}`}>
+          <div className="phase-header-bento">
+            <span className="phase-badge-bento p2-badge-bento">Phase 2</span>
+            <span className="phase-days-bento">Day 61–90</span>
+          </div>
+          <div className="phase-title-bento">Advanced + Mixed Mock</div>
+          <div className="phase-sub-bento">Graphs → DP → Tries → Mock</div>
+          
+          <div className="phase-progress-row-bento">
+            <div className="phase-track-bento">
+              <div 
+                className="p2-fill-bento" 
+                style={{ width: `${phase2Problems.length > 0 ? (phase2Completed / phase2Problems.length) * 100 : 0}%` }}
+              />
+            </div>
+            <span className="phase-pct-bento p2-pct-bento">
+              {phase2Problems.length > 0 ? Math.round((phase2Completed / phase2Problems.length) * 100) : 0}%
+            </span>
+          </div>
+          
+          <div className="phase-counts-bento">
+            {phase2Completed} / {phase2Problems.length} problems
+          </div>
+          
+          {phase1Completed >= phase1Problems.length ? (
+            <Link href="/phase/2" style={{ textDecoration: 'none' }}>
+              <button className="phase-btn-bento">
+                <i className="ti ti-player-play" style={{ fontSize: '13px' }} aria-hidden="true"></i>
+                {phase2Completed > 0 ? 'Continue Phase 2' : 'Start Phase 2'}
+              </button>
+            </Link>
+          ) : (
+            <button 
+              className="phase-btn-bento" 
+              style={{ opacity: 0.5, cursor: 'not-allowed' }}
+              disabled
+            >
+              <i className="ti ti-lock" style={{ fontSize: '13px' }} aria-hidden="true"></i>
+              Unlocks after Phase 1
+            </button>
+          )}
+        </div>
+
+      </div>
+      
+      <p className="label-note-bento">
+        Redesign concept — Bento Grid layout with semantic color coding and interactive daily checklist
+      </p>
+    </div>
+  );
+}
+
+function LandingPage() {
+  return (
+    <div className="landing-container animate-fade-in">
+      {/* Hero Section */}
+      <header className="landing-hero animate-fade-in">
+        <div>
+          <div className="landing-hero-badge">
+            <span>🎓</span> The Ultimate 90-Day DSA Roadmap
+          </div>
+          <h1 className="landing-hero-title">
+            Master DSA & <br />
+            <span>Land Your Dream Job</span>
+          </h1>
+          <p className="landing-hero-subtitle">
+            Ditch the guesswork. Track your progress daily across 200 handpicked LeetCode problems, master the 20 crucial algorithmic patterns, and build your confidence with curated study resources.
+          </p>
+          <div className="landing-hero-actions">
+            <Link href="/register" className="btn-landing-primary">
+              Start Free Journey
+            </Link>
+            <Link href="/login" className="btn-landing-secondary">
+              Sign In to Tracker
+            </Link>
+          </div>
+          <div className="landing-hero-stats">
+            <div className="landing-stat-item">
+              <span className="landing-stat-num">200+</span>
+              <span className="landing-stat-label">Handpicked Qs</span>
+            </div>
+            <div className="landing-stat-item">
+              <span className="landing-stat-num">20</span>
+              <span className="landing-stat-label">Code Patterns</span>
+            </div>
+            <div className="landing-stat-item">
+              <span className="landing-stat-num">90</span>
+              <span className="landing-stat-label">Days Roadmap</span>
+            </div>
+          </div>
+        </div>
+        <div className="landing-hero-graphic">
+          <div className="landing-image-card">
+            <img 
+              src="/dsa_dashboard_mockup.png" 
+              alt="DSA Mastery Tracker Dashboard Mockup" 
+            />
+          </div>
+        </div>
+      </header>
+
+      {/* Features Section */}
+      <section className="landing-section">
+        <div className="landing-section-header">
+          <span className="landing-section-badge">Features</span>
+          <h2 className="landing-section-title">Everything you need to master DSA</h2>
+          <p className="landing-section-subtitle">
+            Built by engineers, for engineers. A streamlined experience designed to maximize retention and keep you highly motivated.
+          </p>
+        </div>
+        <div className="features-grid">
+          <div className="glass-card feature-card">
+            <div className="feature-card-icon">🎯</div>
+            <h3 className="feature-card-title">Interactive Progress Tracking</h3>
+            <p className="feature-card-desc">
+              Tick off problems as you solve them. Watch your solved count grow and monitor your stats breakdown across Easy, Medium, and Hard challenges.
+            </p>
+          </div>
+          <div className="glass-card feature-card">
+            <div className="feature-card-icon">📝</div>
+            <h3 className="feature-card-title">Custom Problem Notes</h3>
+            <p className="feature-card-desc">
+              Save key insights, optimal time complexities, or pseudo-code directly on the problem cards. Your notes are saved automatically in the cloud.
+            </p>
+          </div>
+          <div className="glass-card feature-card">
+            <div className="feature-card-icon">🗂</div>
+            <h3 className="feature-card-title">Pattern Cheatsheet</h3>
+            <p className="feature-card-desc">
+              Access the 20 essential algorithmic patterns (Sliding Window, Two Pointers, Fast & Slow, etc.) with definitions, complexities, and direct problem links.
+            </p>
+          </div>
+          <div className="glass-card feature-card">
+            <div className="feature-card-icon">📚</div>
+            <h3 className="feature-card-title">Curated Resources</h3>
+            <p className="feature-card-desc">
+              Access the best handpicked external sheets, YouTube playlists, platforms, and guides to supplement your understanding without getting overwhelmed.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 90-Day Timeline Section */}
+      <section className="landing-section">
+        <div className="landing-section-header">
+          <span className="landing-section-badge">Roadmap</span>
+          <h2 className="landing-section-title">Two Phases of Absolute Mastery</h2>
+          <p className="landing-section-subtitle">
+            Carefully curated into two distinct phases to build your foundation and then sharpen your advanced skills.
+          </p>
+        </div>
+        <div className="timeline-list">
+          <div className="glass-card timeline-card">
+            <div className="timeline-week">Weeks 1–3</div>
+            <h4 className="timeline-title">Basics & Core DS</h4>
+            <p className="timeline-desc">Arrays, Two Pointers, Sliding Window, Matrix, and Recursion.</p>
+          </div>
+          <div className="glass-card timeline-card">
+            <div className="timeline-week">Weeks 4–6</div>
+            <h4 className="timeline-title">Linear & Trees</h4>
+            <p className="timeline-desc">LinkedLists, Stacks, Queues, Binary Trees, and Binary Search Trees.</p>
+          </div>
+          <div className="glass-card timeline-card">
+            <div className="timeline-week">Weeks 7–9</div>
+            <h4 className="timeline-title">Heaps & Graphs</h4>
+            <p className="timeline-desc">Priority Queues, HashMaps, Backtracking, Graphs (BFS/DFS), and Topo Sort.</p>
+          </div>
+          <div className="glass-card timeline-card">
+            <div className="timeline-week">Weeks 10–14</div>
+            <h4 className="timeline-title">Advanced Topics</h4>
+            <p className="timeline-desc">Dynamic Programming, Greedy Algorithms, Tries, and Mixed Mock Qs.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonial Section */}
+      <section className="landing-section">
+        <div className="glass-card testimonial-card">
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', color: 'var(--primary)', fontStyle: 'normal', marginBottom: '1.5rem', lineHeight: '1.8' }}>
+            कर्मण्येवाधिकारस्ते मा फलेषु कदाचन ।<br />
+            मा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि ॥
+          </p>
+          <p style={{ fontSize: '1.1rem', color: 'var(--on-surface-variant)', lineHeight: '1.7', marginBottom: '1.5rem', maxWidth: '560px', margin: '0 auto 1.5rem' }}>
+            &ldquo;You only have control over your actions, never over their results. Do not perform your duties for the sake of rewards, and never fall into laziness or inaction.&rdquo;
+          </p>
+          <div className="testimonial-author">
+            <span className="testimonial-name">Bhagavad Gita</span>
+            <span className="testimonial-role">Chapter 2, Verse 47</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer style={{ marginTop: '5rem', borderTop: '1px solid var(--outline-variant)', paddingTop: '2rem', textAlign: 'center', color: 'var(--outline)', fontSize: '0.85rem' }}>
+        <p>&copy; {new Date().getFullYear()} DSA Mastery Tracker. Built to empower developers.</p>
+      </footer>
+    </div>
+  );
+}
