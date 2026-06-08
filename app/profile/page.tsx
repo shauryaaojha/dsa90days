@@ -15,6 +15,13 @@ export default function ProfilePage() {
   const [error, setError] = useState('');
   const [progress, setProgress] = useState<{ problemId: string; completed: boolean; completedAt: string | null }[]>([]);
 
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [pwdSaving, setPwdSaving] = useState(false);
+  const [pwdSuccess, setPwdSuccess] = useState(false);
+  const [pwdError, setPwdError] = useState('');
+
   useEffect(() => {
     if (status === 'unauthenticated') router.replace('/login');
     if (session?.user?.name) setName(session.user.name);
@@ -27,6 +34,44 @@ export default function ProfilePage() {
         .then((d) => setProgress(d.progress || []));
     }
   }, [session]);
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwdError('');
+    setPwdSuccess(false);
+
+    if (newPassword !== confirmNewPassword) {
+      setPwdError('New passwords do not match');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPwdError('New password must be at least 6 characters');
+      return;
+    }
+
+    setPwdSaving(true);
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'change-password', oldPassword, newPassword }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPwdError(data.error || 'Failed to change password');
+      } else {
+        setPwdSuccess(true);
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmNewPassword('');
+        setTimeout(() => setPwdSuccess(false), 3000);
+      }
+    } catch {
+      setPwdError('Something went wrong. Please try again.');
+    } finally {
+      setPwdSaving(false);
+    }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -193,6 +238,96 @@ export default function ProfilePage() {
             <div className="profile-success-msg">
               <i className="ti ti-circle-check" style={{ fontSize: '16px' }}></i>
               Profile updated!
+            </div>
+          )}
+        </form>
+      </div>
+
+      {/* Change Password */}
+      <div className="profile-card">
+        <div className="profile-card-title">
+          <i className="ti ti-lock" style={{ fontSize: '14px', color: 'var(--primary)' }}></i>
+          Change password
+        </div>
+
+        {pwdError && (
+          <div className="auth-error-box" style={{ marginBottom: '16px' }}>
+            <i className="ti ti-alert-circle" style={{ fontSize: '15px' }}></i>
+            {pwdError}
+          </div>
+        )}
+
+        <form onSubmit={handlePasswordChange}>
+          <div className="profile-field">
+            <label className="profile-field-label" htmlFor="old-pwd">Current password</label>
+            <div className="profile-input-wrap">
+              <i className="ti ti-lock auth-input-icon"></i>
+              <input
+                id="old-pwd"
+                className="profile-input"
+                type="password"
+                placeholder="Enter your current password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+              />
+            </div>
+          </div>
+
+          <div className="profile-field">
+            <label className="profile-field-label" htmlFor="new-pwd">New password</label>
+            <div className="profile-input-wrap">
+              <i className="ti ti-lock-plus auth-input-icon"></i>
+              <input
+                id="new-pwd"
+                className="profile-input"
+                type="password"
+                placeholder="Min. 6 characters"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+                minLength={6}
+                autoComplete="new-password"
+              />
+            </div>
+          </div>
+
+          <div className="profile-field">
+            <label className="profile-field-label" htmlFor="confirm-new-pwd">Confirm new password</label>
+            <div className="profile-input-wrap">
+              <i className="ti ti-lock-check auth-input-icon"></i>
+              <input
+                id="confirm-new-pwd"
+                className="profile-input"
+                type="password"
+                placeholder="Re-enter new password"
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                required
+                autoComplete="new-password"
+              />
+            </div>
+          </div>
+
+          <button type="submit" className="profile-save-btn" disabled={pwdSaving}>
+            {pwdSaving ? (
+              <>
+                <span className="auth-btn-spinner"></span>
+                Updating...
+              </>
+            ) : (
+              <>
+                <i className="ti ti-shield-lock" style={{ fontSize: '15px' }}></i>
+                Update password
+              </>
+            )}
+          </button>
+
+          {pwdSuccess && (
+            <div className="profile-success-msg">
+              <i className="ti ti-circle-check" style={{ fontSize: '16px' }}></i>
+              Password changed successfully!
             </div>
           )}
         </form>
