@@ -30,8 +30,8 @@ export default function Navbar() {
     <header className="navbar-wrap">
       <nav className="navbar-dock animate-fade-in">
         <Link href="/" className="nav-logo-dock" style={{ textDecoration: 'none' }}>
-          <div className="logo-icon-dock">
-            <i className="ti ti-code" style={{ fontSize: '17px' }}></i>
+          <div className="logo-icon-dock logo-om-dock">
+            ॐ
           </div>
           <span className="logo-text-dock">DSA <span>Tracker</span></span>
         </Link>

@@ -83,8 +83,8 @@ export default function RegisterPage() {
       <div className="auth-split-left">
         <div className="auth-brand-panel">
           <div className="auth-brand-logo">
-            <div className="auth-brand-logo-icon">
-              <i className="ti ti-code" style={{ fontSize: '18px' }}></i>
+            <div className="auth-brand-logo-icon" style={{ fontSize: '20px', fontFamily: 'serif' }}>
+              ॐ
             </div>
             <span>DSA Tracker</span>
           </div>

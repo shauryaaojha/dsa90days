@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { problems } from '@/data/problems';
 import { weeks } from '@/data/weeks';
 import { patterns } from '@/data/patterns';
+import PledgeModal from '@/components/PledgeModal';
 
 interface ProgressEntry {
   problemId: string;
@@ -19,14 +20,30 @@ export default function DashboardPage() {
   const { data: session, status } = useSession();
   const [progress, setProgress] = useState<ProgressEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pledgeDate, setPledgeDate] = useState<string | null>(null);
+  const [pledgeLoading, setPledgeLoading] = useState(true);
 
   useEffect(() => {
     if (session) {
       fetchProgress();
+      fetchPledge();
     } else if (status === 'unauthenticated') {
       setLoading(false);
+      setPledgeLoading(false);
     }
   }, [session, status]);
+
+  const fetchPledge = async () => {
+    try {
+      const res = await fetch('/api/pledge');
+      const data = await res.json();
+      setPledgeDate(data.pledgeAcceptedAt ?? null);
+    } catch {
+      setPledgeDate(null);
+    } finally {
+      setPledgeLoading(false);
+    }
+  };
 
   const fetchProgress = async () => {
     try {
@@ -86,7 +103,7 @@ export default function DashboardPage() {
     }
   };
 
-  if (status === 'loading' || (session && loading)) {
+  if (status === 'loading' || (session && (loading || pledgeLoading))) {
     return (
       <div className="loading-spinner">
         <div className="spinner" />
@@ -119,18 +136,10 @@ export default function DashboardPage() {
     problems.filter((p) => completedIds.has(p.id)).map((p) => p.day)
   );
 
-  // Dynamic today's learning day calculation: Smallest day with uncompleted problems
-  let todayDay = 1;
-  for (let d = 1; d <= 90; d++) {
-    const dayProbs = problems.filter((p) => p.day === d);
-    if (dayProbs.length > 0) {
-      const allDone = dayProbs.every((p) => completedIds.has(p.id));
-      if (!allDone) {
-        todayDay = d;
-        break;
-      }
-    }
-  }
+  // Calendar-based day counter — counts real days since pledge date
+  const todayDay = pledgeDate
+    ? Math.min(90, Math.max(1, Math.floor((Date.now() - new Date(pledgeDate).getTime()) / 86_400_000) + 1))
+    : 1;
 
   // Today's questions list
   const todaysQuestions = problems.filter((p) => p.day === todayDay);
@@ -230,6 +239,13 @@ export default function DashboardPage() {
   const strokeDashoffset = strokeDasharray - (strokeDasharray * percentage) / 100;
 
   return (
+    <>
+    {!pledgeDate && (
+      <PledgeModal
+        userName={session.user?.name || 'Warrior'}
+        onAccepted={(date) => setPledgeDate(date)}
+      />
+    )}
     <div className="wrap-bento page-container" style={{ padding: '1.75rem 1.5rem 4rem' }}>
       
       {/* Bento Grid */}
@@ -560,8 +576,9 @@ export default function DashboardPage() {
         </div>
 
       </div>
-      
+
     </div>
+    </>
   );
 }
 

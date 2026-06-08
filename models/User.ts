@@ -5,6 +5,7 @@ export interface IUser extends Document {
   password: string;
   name: string;
   createdAt: Date;
+  pledgeAcceptedAt: Date | null;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -28,6 +29,10 @@ const UserSchema = new Schema<IUser>({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  pledgeAcceptedAt: {
+    type: Date,
+    default: null,
   },
 });
 
