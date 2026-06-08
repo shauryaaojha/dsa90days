@@ -79,122 +79,155 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="spotify-auth-container animate-fade-in">
-      <div className="spotify-auth-card">
-        <div className="spotify-auth-header">
-          <div className="spotify-auth-logo">
-            <span className="spotify-auth-logo-icon">⚡</span>
-            <span>DSA TRACKER</span>
+    <div className="auth-page-container animate-fade-in">
+      <div className="auth-split-left">
+        <div className="auth-brand-panel">
+          <div className="auth-brand-logo">
+            <i className="ti ti-code" style={{ fontSize: '22px' }}></i>
+            <span>DSA Tracker</span>
           </div>
-          <h1 className="spotify-auth-title">Sign up to start tracking</h1>
-          <p className="spotify-auth-subtitle">Create a free account to track your progress</p>
+          <div className="auth-brand-body">
+            <h2 className="auth-brand-heading">Start your 90-day journey.</h2>
+            <p className="auth-brand-sub">Join engineers who&apos;ve structured their prep and landed top-tier offers. Free, always.</p>
+            <div className="auth-brand-checklist">
+              <div className="auth-brand-check-item"><i className="ti ti-check"></i> 200+ curated LeetCode problems</div>
+              <div className="auth-brand-check-item"><i className="ti ti-check"></i> Daily progress tracking &amp; streaks</div>
+              <div className="auth-brand-check-item"><i className="ti ti-check"></i> 20 essential algorithm patterns</div>
+              <div className="auth-brand-check-item"><i className="ti ti-check"></i> Video solutions &amp; curated resources</div>
+            </div>
+          </div>
+          <div className="auth-brand-quote">
+            &ldquo;कर्मण्येवाधिकारस्ते मा फलेषु कदाचन&rdquo;
+          </div>
         </div>
+      </div>
 
-        {error && <div className="spotify-auth-error">{error}</div>}
-
-        <form onSubmit={handleSubmit}>
-          <div className="spotify-form-group">
-            <label className="spotify-form-label" htmlFor="register-name">
-              Full Name
-            </label>
-            <input
-              id="register-name"
-              className="spotify-form-input"
-              type="text"
-              placeholder="What should we call you?"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
+      <div className="auth-split-right">
+        <div className="auth-form-card">
+          <div className="auth-form-header">
+            <h1 className="auth-form-title">Create your account</h1>
+            <p className="auth-form-sub">Free forever. No credit card needed.</p>
           </div>
 
-          <div className="spotify-form-group">
-            <label className="spotify-form-label" htmlFor="register-email">
-              Email Address
-            </label>
-            <input
-              id="register-email"
-              className="spotify-form-input"
-              type="email"
-              placeholder="name@domain.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+          {error && (
+            <div className="auth-error-box">
+              <i className="ti ti-alert-circle" style={{ fontSize: '15px' }}></i>
+              {error}
+            </div>
+          )}
 
-          <div className="spotify-form-group">
-            <label className="spotify-form-label" htmlFor="register-password">
-              Password
-            </label>
-            <input
-              id="register-password"
-              className="spotify-form-input"
-              type="password"
-              placeholder="Create a password (min. 6 chars)"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="auth-field">
+              <label className="auth-field-label" htmlFor="register-name">Name</label>
+              <div className="auth-input-wrap">
+                <i className="ti ti-user auth-input-icon"></i>
+                <input
+                  id="register-name"
+                  className="auth-input"
+                  type="text"
+                  placeholder="Your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  autoComplete="name"
+                />
+              </div>
+            </div>
 
-          <div className="spotify-form-group">
-            <label className="spotify-form-label" htmlFor="register-confirm">
-              Confirm Password
-            </label>
-            <input
-              id="register-confirm"
-              className="spotify-form-input"
-              type="password"
-              placeholder="Re-enter your password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-          </div>
+            <div className="auth-field">
+              <label className="auth-field-label" htmlFor="register-email">Email</label>
+              <div className="auth-input-wrap">
+                <i className="ti ti-mail auth-input-icon"></i>
+                <input
+                  id="register-email"
+                  className="auth-input"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                />
+              </div>
+            </div>
 
-          {/* Honeypot field to catch automated bots */}
-          <div style={{ display: 'none' }}>
-            <label htmlFor="website">Leave this field blank</label>
-            <input
-              id="website"
-              type="text"
-              name="website"
-              tabIndex={-1}
-              autoComplete="off"
-              value={honeypot}
-              onChange={(e) => setHoneypot(e.target.value)}
-            />
-          </div>
+            <div className="auth-field-row">
+              <div className="auth-field">
+                <label className="auth-field-label" htmlFor="register-password">Password</label>
+                <div className="auth-input-wrap">
+                  <i className="ti ti-lock auth-input-icon"></i>
+                  <input
+                    id="register-password"
+                    className="auth-input"
+                    type="password"
+                    placeholder="Min. 6 chars"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    autoComplete="new-password"
+                  />
+                </div>
+              </div>
+              <div className="auth-field">
+                <label className="auth-field-label" htmlFor="register-confirm">Confirm</label>
+                <div className="auth-input-wrap">
+                  <i className="ti ti-lock-check auth-input-icon"></i>
+                  <input
+                    id="register-confirm"
+                    className="auth-input"
+                    type="password"
+                    placeholder="Re-enter"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    autoComplete="new-password"
+                  />
+                </div>
+              </div>
+            </div>
 
-          <div className="spotify-form-group">
-            <label className="spotify-form-label" htmlFor="register-captcha">
-              Human Verification: What is {num1} + {num2}?
-            </label>
-            <input
-              id="register-captcha"
-              className="spotify-form-input"
-              type="number"
-              placeholder="Sum of the two numbers"
-              value={captchaAnswer}
-              onChange={(e) => setCaptchaAnswer(e.target.value)}
-              required
-            />
-          </div>
+            <div style={{ display: 'none' }}>
+              <input id="website" type="text" name="website" tabIndex={-1} autoComplete="off" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
+            </div>
 
-          <button
-            type="submit"
-            className="spotify-auth-btn"
-            disabled={loading}
-          >
-            {loading ? 'Creating account...' : 'Create Account'}
-          </button>
-        </form>
+            <div className="auth-field auth-captcha-field">
+              <label className="auth-field-label" htmlFor="register-captcha">
+                Quick check: what is <strong>{num1} + {num2}</strong>?
+              </label>
+              <div className="auth-input-wrap">
+                <i className="ti ti-math auth-input-icon"></i>
+                <input
+                  id="register-captcha"
+                  className="auth-input"
+                  type="number"
+                  placeholder="Answer"
+                  value={captchaAnswer}
+                  onChange={(e) => setCaptchaAnswer(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
 
-        <div className="spotify-auth-footer">
-          Already have an account?{' '}
-          <Link href="/login">Log in here</Link>
+            <button type="submit" className="auth-submit-btn" disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="auth-btn-spinner"></span>
+                  Creating account...
+                </>
+              ) : (
+                <>
+                  <i className="ti ti-user-plus" style={{ fontSize: '16px' }}></i>
+                  Create Account
+                </>
+              )}
+            </button>
+          </form>
+
+          <p className="auth-switch-text">
+            Already have an account?{' '}
+            <Link href="/login" className="auth-switch-link">Sign in</Link>
+          </p>
         </div>
       </div>
     </div>

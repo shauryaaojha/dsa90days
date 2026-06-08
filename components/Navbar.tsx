@@ -30,15 +30,16 @@ export default function Navbar() {
     .toUpperCase();
 
   return (
-    <div style={{ maxWidth: '1024px', margin: '0 auto', padding: '0 1.5rem' }}>
+    <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 1.5rem' }}>
       <nav className="navbar-dock animate-fade-in">
         <Link href="/" className="nav-logo-dock" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-          <div style={{ width: '28px', height: '28px', borderRadius: '8px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ffdbce' }}>
-            <img
-              src="/logo.png"
-              alt="DSA Tracker Logo"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scale(3)', transformOrigin: 'center' }}
-            />
+          <div style={{
+            width: '30px', height: '30px', borderRadius: '8px',
+            background: 'var(--primary)', color: 'white',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '14px', flexShrink: 0,
+          }}>
+            <i className="ti ti-code" style={{ fontSize: '16px' }}></i>
           </div>
           <span className="logo-text-dock">DSA Tracker</span>
         </Link>

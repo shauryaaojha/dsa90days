@@ -558,47 +558,73 @@ function LandingPage() {
   return (
     <div className="landing-container animate-fade-in">
       {/* Hero Section */}
-      <header className="landing-hero animate-fade-in">
-        <div>
+      <header className="landing-hero">
+        <div className="landing-hero-content">
           <div className="landing-hero-badge">
-            <span>🎓</span> The Ultimate 90-Day DSA Roadmap
+            <i className="ti ti-trophy" style={{ fontSize: '13px' }}></i>
+            90-Day DSA Mastery Roadmap
           </div>
           <h1 className="landing-hero-title">
-            Master DSA & <br />
-            <span>Land Your Dream Job</span>
+            Go from Zero to <br />
+            <span>Interview Ready</span>
           </h1>
           <p className="landing-hero-subtitle">
-            Ditch the guesswork. Track your progress daily across 200 handpicked LeetCode problems, master the 20 crucial algorithmic patterns, and build your confidence with curated study resources.
+            200+ handpicked LeetCode problems. Daily check-ins. Pattern cheatsheets. Everything you need to crack top-tier SWE interviews — structured into a focused 90-day plan.
           </p>
           <div className="landing-hero-actions">
             <Link href="/register" className="btn-landing-primary">
-              Start Free Journey
+              <i className="ti ti-rocket" style={{ fontSize: '15px' }}></i>
+              Start for Free
             </Link>
             <Link href="/login" className="btn-landing-secondary">
-              Sign In to Tracker
+              Sign In
             </Link>
           </div>
           <div className="landing-hero-stats">
             <div className="landing-stat-item">
               <span className="landing-stat-num">200+</span>
-              <span className="landing-stat-label">Handpicked Qs</span>
+              <span className="landing-stat-label">Curated Problems</span>
             </div>
+            <div className="landing-stat-divider" />
             <div className="landing-stat-item">
               <span className="landing-stat-num">20</span>
-              <span className="landing-stat-label">Code Patterns</span>
+              <span className="landing-stat-label">Key Patterns</span>
             </div>
+            <div className="landing-stat-divider" />
             <div className="landing-stat-item">
               <span className="landing-stat-num">90</span>
-              <span className="landing-stat-label">Days Roadmap</span>
+              <span className="landing-stat-label">Day Roadmap</span>
             </div>
           </div>
         </div>
         <div className="landing-hero-graphic">
-          <div className="landing-image-card">
-            <img 
-              src="/dsa_dashboard_mockup.png" 
-              alt="DSA Mastery Tracker Dashboard Mockup" 
-            />
+          <div className="landing-hero-visual">
+            <div className="landing-visual-card lvc-top">
+              <div className="lvc-icon"><i className="ti ti-flame"></i></div>
+              <div className="lvc-text">
+                <div className="lvc-label">Current Streak</div>
+                <div className="lvc-val">7 days 🔥</div>
+              </div>
+            </div>
+            <div className="landing-visual-card lvc-mid">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--on-surface)' }}>Overall Progress</span>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--primary)' }}>68%</span>
+              </div>
+              <div className="lvc-track"><div className="lvc-fill" style={{ width: '68%' }} /></div>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                <span className="lvc-badge lvc-easy">Easy 45/60</span>
+                <span className="lvc-badge lvc-med">Med 80/110</span>
+                <span className="lvc-badge lvc-hard">Hard 11/30</span>
+              </div>
+            </div>
+            <div className="landing-visual-card lvc-bottom">
+              <div className="lvc-icon lvc-icon-green"><i className="ti ti-check"></i></div>
+              <div className="lvc-text">
+                <div className="lvc-label">Today&apos;s problems done</div>
+                <div className="lvc-val" style={{ color: 'var(--secondary)' }}>3 / 3 ✓</div>
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -607,38 +633,46 @@ function LandingPage() {
       <section className="landing-section">
         <div className="landing-section-header">
           <span className="landing-section-badge">Features</span>
-          <h2 className="landing-section-title">Everything you need to master DSA</h2>
+          <h2 className="landing-section-title">Built for serious preparation</h2>
           <p className="landing-section-subtitle">
-            Built by engineers, for engineers. A streamlined experience designed to maximize retention and keep you highly motivated.
+            No distractions, no fluff — a razor-sharp tracker built to keep you consistent and confident.
           </p>
         </div>
         <div className="features-grid">
           <div className="glass-card feature-card">
-            <div className="feature-card-icon">🎯</div>
-            <h3 className="feature-card-title">Interactive Progress Tracking</h3>
+            <div className="feature-card-icon-wrap feature-icon-orange">
+              <i className="ti ti-checkbox" style={{ fontSize: '20px' }}></i>
+            </div>
+            <h3 className="feature-card-title">Daily Progress Tracking</h3>
             <p className="feature-card-desc">
-              Tick off problems as you solve them. Watch your solved count grow and monitor your stats breakdown across Easy, Medium, and Hard challenges.
+              Check off problems as you go. Visual streak grids and difficulty breakdowns keep you motivated and accountable every single day.
             </p>
           </div>
           <div className="glass-card feature-card">
-            <div className="feature-card-icon">📝</div>
-            <h3 className="feature-card-title">Custom Problem Notes</h3>
+            <div className="feature-card-icon-wrap feature-icon-green">
+              <i className="ti ti-notes" style={{ fontSize: '20px' }}></i>
+            </div>
+            <h3 className="feature-card-title">Problem Notes</h3>
             <p className="feature-card-desc">
-              Save key insights, optimal time complexities, or pseudo-code directly on the problem cards. Your notes are saved automatically in the cloud.
+              Jot down time complexities, tricks, or pseudo-code right on the problem card. Notes auto-save to the cloud so you never lose insights.
             </p>
           </div>
           <div className="glass-card feature-card">
-            <div className="feature-card-icon">🗂</div>
+            <div className="feature-card-icon-wrap feature-icon-orange">
+              <i className="ti ti-map-2" style={{ fontSize: '20px' }}></i>
+            </div>
             <h3 className="feature-card-title">Pattern Cheatsheet</h3>
             <p className="feature-card-desc">
-              Access the 20 essential algorithmic patterns (Sliding Window, Two Pointers, Fast & Slow, etc.) with definitions, complexities, and direct problem links.
+              20 essential patterns — Sliding Window, Two Pointers, BFS/DFS, and more — with time/space complexity and direct problem links.
             </p>
           </div>
           <div className="glass-card feature-card">
-            <div className="feature-card-icon">📚</div>
+            <div className="feature-card-icon-wrap feature-icon-green">
+              <i className="ti ti-books" style={{ fontSize: '20px' }}></i>
+            </div>
             <h3 className="feature-card-title">Curated Resources</h3>
             <p className="feature-card-desc">
-              Access the best handpicked external sheets, YouTube playlists, platforms, and guides to supplement your understanding without getting overwhelmed.
+              Handpicked YouTube playlists, sheets, and platforms — Striver, Apna College, NeetCode — so you always know what to watch next.
             </p>
           </div>
         </div>
@@ -648,44 +682,48 @@ function LandingPage() {
       <section className="landing-section">
         <div className="landing-section-header">
           <span className="landing-section-badge">Roadmap</span>
-          <h2 className="landing-section-title">Two Phases of Absolute Mastery</h2>
+          <h2 className="landing-section-title">Two phases. One goal.</h2>
           <p className="landing-section-subtitle">
-            Carefully curated into two distinct phases to build your foundation and then sharpen your advanced skills.
+            Foundation first, then mastery. Each week builds on the last so you&apos;re never overwhelmed.
           </p>
         </div>
         <div className="timeline-list">
           <div className="glass-card timeline-card">
+            <div className="timeline-phase-dot dot-orange"></div>
             <div className="timeline-week">Weeks 1–3</div>
-            <h4 className="timeline-title">Basics & Core DS</h4>
-            <p className="timeline-desc">Arrays, Two Pointers, Sliding Window, Matrix, and Recursion.</p>
+            <h4 className="timeline-title">Core Foundations</h4>
+            <p className="timeline-desc">Arrays, Two Pointers, Sliding Window, Matrices, and Recursion.</p>
           </div>
           <div className="glass-card timeline-card">
+            <div className="timeline-phase-dot dot-orange"></div>
             <div className="timeline-week">Weeks 4–6</div>
             <h4 className="timeline-title">Linear & Trees</h4>
-            <p className="timeline-desc">LinkedLists, Stacks, Queues, Binary Trees, and Binary Search Trees.</p>
+            <p className="timeline-desc">Linked Lists, Stacks, Queues, Binary Trees, and BSTs.</p>
           </div>
           <div className="glass-card timeline-card">
+            <div className="timeline-phase-dot dot-green"></div>
             <div className="timeline-week">Weeks 7–9</div>
             <h4 className="timeline-title">Heaps & Graphs</h4>
-            <p className="timeline-desc">Priority Queues, HashMaps, Backtracking, Graphs (BFS/DFS), and Topo Sort.</p>
+            <p className="timeline-desc">Priority Queues, HashMaps, Backtracking, BFS/DFS, Topo Sort.</p>
           </div>
           <div className="glass-card timeline-card">
-            <div className="timeline-week">Weeks 10–14</div>
-            <h4 className="timeline-title">Advanced Topics</h4>
-            <p className="timeline-desc">Dynamic Programming, Greedy Algorithms, Tries, and Mixed Mock Qs.</p>
+            <div className="timeline-phase-dot dot-green"></div>
+            <div className="timeline-week">Weeks 10–13</div>
+            <h4 className="timeline-title">Advanced Mastery</h4>
+            <p className="timeline-desc">Dynamic Programming, Greedy, Tries, and Mixed Mock problems.</p>
           </div>
         </div>
       </section>
 
-      {/* Testimonial Section */}
+      {/* Quote Section */}
       <section className="landing-section">
         <div className="glass-card testimonial-card">
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', color: 'var(--primary)', fontStyle: 'normal', marginBottom: '1.5rem', lineHeight: '1.8' }}>
-            कर्मण्येवाधिकारस्ते मा फलेषु कदाचन ।<br />
-            मा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि ॥
+          <div className="testimonial-quote-mark">&ldquo;</div>
+          <p className="testimonial-sanskrit">
+            कर्मण्येवाधिकारस्ते मा फलेषु कदाचन
           </p>
-          <p style={{ fontSize: '1.1rem', color: 'var(--on-surface-variant)', lineHeight: '1.7', marginBottom: '1.5rem', maxWidth: '560px', margin: '0 auto 1.5rem' }}>
-            &ldquo;You only have control over your actions, never over their results. Do not perform your duties for the sake of rewards, and never fall into laziness or inaction.&rdquo;
+          <p className="testimonial-translation">
+            You have the right to perform your actions, but never to the fruits of those actions. Focus on the work — the results will follow.
           </p>
           <div className="testimonial-author">
             <span className="testimonial-name">Bhagavad Gita</span>
@@ -694,9 +732,21 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* CTA Section */}
+      <section className="landing-cta-section">
+        <div className="landing-cta-card">
+          <h2 className="landing-cta-title">Ready to commit to 90 days?</h2>
+          <p className="landing-cta-sub">Join hundreds of engineers who started their journey. It&apos;s free, forever.</p>
+          <Link href="/register" className="btn-landing-primary btn-cta-large">
+            <i className="ti ti-rocket" style={{ fontSize: '16px' }}></i>
+            Create Free Account
+          </Link>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer style={{ marginTop: '5rem', borderTop: '1px solid var(--outline-variant)', paddingTop: '2rem', textAlign: 'center', color: 'var(--outline)', fontSize: '0.85rem' }}>
-        <p>&copy; {new Date().getFullYear()} DSA Mastery Tracker. Built to empower developers.</p>
+      <footer className="landing-footer">
+        <p>&copy; {new Date().getFullYear()} DSA Mastery Tracker &mdash; Built to empower developers.</p>
       </footer>
     </div>
   );

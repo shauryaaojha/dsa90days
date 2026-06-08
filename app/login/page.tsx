@@ -38,62 +38,105 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="spotify-auth-container animate-fade-in">
-      <div className="spotify-auth-card">
-        <div className="spotify-auth-header">
-          <div className="spotify-auth-logo">
-            <span className="spotify-auth-logo-icon">⚡</span>
-            <span>DSA TRACKER</span>
+    <div className="auth-page-container animate-fade-in">
+      <div className="auth-split-left">
+        <div className="auth-brand-panel">
+          <div className="auth-brand-logo">
+            <i className="ti ti-code" style={{ fontSize: '22px' }}></i>
+            <span>DSA Tracker</span>
           </div>
-          <h1 className="spotify-auth-title">Log in to DSA Tracker</h1>
-          <p className="spotify-auth-subtitle">Continue your 90-day mastery plan</p>
+          <div className="auth-brand-body">
+            <h2 className="auth-brand-heading">Back to the grind.</h2>
+            <p className="auth-brand-sub">Your progress is waiting. Every day you practice, you compound your edge over the competition.</p>
+            <div className="auth-brand-stats">
+              <div className="auth-brand-stat">
+                <span className="auth-brand-stat-num">200+</span>
+                <span className="auth-brand-stat-lbl">Problems</span>
+              </div>
+              <div className="auth-brand-stat">
+                <span className="auth-brand-stat-num">90</span>
+                <span className="auth-brand-stat-lbl">Day Plan</span>
+              </div>
+              <div className="auth-brand-stat">
+                <span className="auth-brand-stat-num">20</span>
+                <span className="auth-brand-stat-lbl">Patterns</span>
+              </div>
+            </div>
+          </div>
+          <div className="auth-brand-quote">
+            &ldquo;कर्मण्येवाधिकारस्ते मा फलेषु कदाचन&rdquo;
+          </div>
         </div>
+      </div>
 
-        {error && <div className="spotify-auth-error">{error}</div>}
-
-        <form onSubmit={handleSubmit}>
-          <div className="spotify-form-group">
-            <label className="spotify-form-label" htmlFor="login-email">
-              Email Address
-            </label>
-            <input
-              id="login-email"
-              className="spotify-form-input"
-              type="email"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+      <div className="auth-split-right">
+        <div className="auth-form-card">
+          <div className="auth-form-header">
+            <h1 className="auth-form-title">Welcome back</h1>
+            <p className="auth-form-sub">Sign in to continue your journey</p>
           </div>
 
-          <div className="spotify-form-group">
-            <label className="spotify-form-label" htmlFor="login-password">
-              Password
-            </label>
-            <input
-              id="login-password"
-              className="spotify-form-input"
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+          {error && (
+            <div className="auth-error-box">
+              <i className="ti ti-alert-circle" style={{ fontSize: '15px' }}></i>
+              {error}
+            </div>
+          )}
 
-          <button
-            type="submit"
-            className="spotify-auth-btn"
-            disabled={loading}
-          >
-            {loading ? 'Logging in...' : 'Log In'}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="auth-field">
+              <label className="auth-field-label" htmlFor="login-email">Email</label>
+              <div className="auth-input-wrap">
+                <i className="ti ti-mail auth-input-icon"></i>
+                <input
+                  id="login-email"
+                  className="auth-input"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                />
+              </div>
+            </div>
 
-        <div className="spotify-auth-footer">
-          Don&apos;t have an account?{' '}
-          <Link href="/register">Sign up for DSA Tracker</Link>
+            <div className="auth-field">
+              <label className="auth-field-label" htmlFor="login-password">Password</label>
+              <div className="auth-input-wrap">
+                <i className="ti ti-lock auth-input-icon"></i>
+                <input
+                  id="login-password"
+                  className="auth-input"
+                  type="password"
+                  placeholder="Your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
+            </div>
+
+            <button type="submit" className="auth-submit-btn" disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="auth-btn-spinner"></span>
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  <i className="ti ti-login-2" style={{ fontSize: '16px' }}></i>
+                  Sign In
+                </>
+              )}
+            </button>
+          </form>
+
+          <p className="auth-switch-text">
+            New here?{' '}
+            <Link href="/register" className="auth-switch-link">Create a free account</Link>
+          </p>
         </div>
       </div>
     </div>
