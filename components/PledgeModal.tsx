@@ -13,6 +13,7 @@ export default function PledgeModal({ userName, onAccepted }: Props) {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showEnglish, setShowEnglish] = useState(false);
 
   const isMatch = input.trim().toLowerCase() === ACCEPTANCE_PHRASE.toLowerCase();
 
@@ -52,14 +53,26 @@ export default function PledgeModal({ userName, onAccepted }: Props) {
 
         {/* Bhagavad Gita verse */}
         <div className="pledge-verse-card">
-          <p className="pledge-sanskrit">
-            क्लैब्यं मा स्म गमः पार्थ नैतत्त्वय्युपपद्यते।<br />
-            क्षुद्रं हृदयदौर्बल्यं त्यक्त्वोत्तिष्ठ परन्तप॥
-          </p>
-          <p className="pledge-translation">
-            &ldquo;Do not yield to weakness, O Arjuna — it does not befit you. Shake off this faint-heartedness and <strong>arise</strong>, O scorcher of enemies.&rdquo;
-          </p>
-          <p className="pledge-ref">— Bhagavad Gita, Chapter 2 · Verse 3</p>
+          {showEnglish ? (
+            <p className="pledge-translation" style={{ marginBottom: '14px' }}>
+              &ldquo;Do not yield to weakness, O Arjuna — it does not befit you. Shake off this faint-heartedness and <strong>arise</strong>, O scorcher of enemies.&rdquo;
+            </p>
+          ) : (
+            <p className="pledge-sanskrit">
+              क्लैब्यं मा स्म गमः पार्थ नैतत्त्वय्युपपद्यते।<br />
+              क्षुद्रं हृदयदौर्बल्यं त्यक्त्वोत्तिष्ठ परन्तप॥
+            </p>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+            <p className="pledge-ref">— Bhagavad Gita, Chapter 2 · Verse 3</p>
+            <button
+              type="button"
+              className="pledge-translate-btn"
+              onClick={() => setShowEnglish((v) => !v)}
+            >
+              {showEnglish ? 'Sanskrit' : 'English'}
+            </button>
+          </div>
         </div>
 
         {/* Why this verse */}

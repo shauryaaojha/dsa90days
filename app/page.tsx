@@ -8,6 +8,14 @@ import { problems } from '@/data/problems';
 import { weeks } from '@/data/weeks';
 import { patterns } from '@/data/patterns';
 import PledgeModal from '@/components/PledgeModal';
+import DailyQuoteModal from '@/components/DailyQuoteModal';
+
+interface DailyQuote {
+  text: string;
+  translation?: string;
+  meaning: string;
+  source: string;
+}
 
 interface ProgressEntry {
   problemId: string;
@@ -22,6 +30,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [pledgeDate, setPledgeDate] = useState<string | null>(null);
   const [pledgeLoading, setPledgeLoading] = useState(true);
+  const [dailyQuote, setDailyQuote] = useState<DailyQuote | null>(null);
+  const [showQuoteModal, setShowQuoteModal] = useState(false);
 
   useEffect(() => {
     if (session) {
@@ -32,6 +42,27 @@ export default function DashboardPage() {
       setPledgeLoading(false);
     }
   }, [session, status]);
+
+  useEffect(() => {
+    if (!pledgeLoading && pledgeDate) {
+      const today = new Date().toDateString();
+      if (localStorage.getItem('dsa_quote_date') !== today) {
+        fetchDailyQuote(today);
+      }
+    }
+  }, [pledgeLoading, pledgeDate]);
+
+  const fetchDailyQuote = async (_today: string) => {
+    try {
+      const res = await fetch('/api/quote');
+      if (!res.ok) return;
+      const data = await res.json();
+      setDailyQuote(data.quote);
+      setShowQuoteModal(true);
+    } catch {
+      // silently fail — quote is non-critical
+    }
+  };
 
   const fetchPledge = async () => {
     try {
@@ -244,6 +275,15 @@ export default function DashboardPage() {
       <PledgeModal
         userName={session.user?.name || 'Warrior'}
         onAccepted={(date) => setPledgeDate(date)}
+      />
+    )}
+    {showQuoteModal && dailyQuote && (
+      <DailyQuoteModal
+        quote={dailyQuote}
+        onClose={() => {
+          localStorage.setItem('dsa_quote_date', new Date().toDateString());
+          setShowQuoteModal(false);
+        }}
       />
     )}
     <div className="wrap-bento page-container" style={{ padding: '1.75rem 1.5rem 4rem' }}>
