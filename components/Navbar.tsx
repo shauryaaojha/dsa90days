@@ -8,7 +8,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  if (!session) return null;
+  if (!session || pathname.startsWith('/admin')) return null;
 
   const links = [
     { href: '/', label: 'Dashboard' },
