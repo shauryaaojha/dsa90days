@@ -2558,3 +2558,150 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 .p0-pct-bento { color: var(--secondary); }
 
+/* =========================================================================
+   PATTERN CHEATSHEET — index filter bar, cards, and the detail page.
+   The detail page reuses the Phase 0 lesson shell (.lsn-*) above.
+   ========================================================================= */
+/* ─── Pattern Cheatsheet: index filter bar ───────────────────────────────────── */
+.ptn-filter-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+  margin-bottom: 20px;
+}
+.ptn-search {
+  position: relative; display: flex; align-items: center; gap: 8px;
+  flex: 1 1 320px; min-width: 0;
+  background: #ffffff; border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-full); padding: 0 14px; height: 42px;
+  transition: border-color var(--t-base), box-shadow var(--t-base);
+}
+.ptn-search:focus-within { border-color: var(--primary); box-shadow: var(--shadow-card); }
+.ptn-search > i { font-size: 17px; color: var(--outline); flex-shrink: 0; }
+.ptn-search input {
+  flex: 1; min-width: 0; border: 0; outline: none; background: transparent;
+  font-size: 14px; color: var(--on-surface); font-family: inherit;
+}
+.ptn-search input::-webkit-search-cancel-button { display: none; }
+.ptn-search button {
+  border: 0; background: transparent; cursor: pointer; color: var(--outline);
+  display: flex; padding: 2px; border-radius: var(--radius-full);
+}
+.ptn-search button:hover { color: var(--on-surface); }
+
+.ptn-cat-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ptn-cat-chip {
+  font-size: 12.5px; font-weight: 600; font-family: inherit; cursor: pointer;
+  padding: 7px 13px; border-radius: var(--radius-full);
+  background: var(--surface-container); color: var(--on-surface-variant);
+  border: 1px solid transparent;
+  transition: background var(--t-base), color var(--t-base), border-color var(--t-base);
+}
+.ptn-cat-chip:hover { border-color: var(--outline-variant); }
+.ptn-cat-chip.is-active { background: var(--primary); color: var(--on-primary); }
+
+.ptn-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  padding: 3rem 1rem; text-align: center; color: var(--on-surface-variant);
+}
+.ptn-empty i { font-size: 34px; color: var(--outline); }
+
+/* ─── Pattern cards (index) ──────────────────────────────────────────────────── */
+.ptn-card-link { text-decoration: none; color: inherit; }
+.ptn-card-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding-top: 12px; border-top: 1px solid var(--outline-variant);
+  font-size: 12px;
+}
+.ptn-card-cat {
+  font-weight: 600; color: var(--outline);
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ptn-card-more {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-weight: 700; color: var(--primary);
+}
+.ptn-card-link:hover .ptn-card-more i { transform: translateX(2px); }
+.ptn-card-more i { transition: transform var(--t-base); }
+
+/* ─── Pattern detail ─────────────────────────────────────────────────────────── */
+.ptn-triggers {
+  margin: 1.75rem 0; padding: 18px 20px;
+  background: var(--secondary-container); border-radius: var(--radius-lg);
+}
+.ptn-triggers h2 {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 16px; font-weight: 700; color: var(--on-secondary-container);
+  margin: 0 0 4px;
+}
+.ptn-triggers-lead {
+  font-size: 13.5px; color: var(--on-secondary-container); opacity: 0.85;
+  margin: 0 0 10px;
+}
+.ptn-triggers ul { margin: 0; padding-left: 1.15rem; display: grid; gap: 7px; }
+.ptn-triggers li { font-size: 14.5px; line-height: 1.6; color: var(--on-secondary-container); }
+
+.ptn-template, .ptn-variants, .ptn-problems, .ptn-pitfalls, .ptn-related { margin: 2rem 0; }
+.ptn-template h2, .ptn-variants h2, .ptn-problems h2,
+.ptn-pitfalls h2, .ptn-related h2 {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 17px; font-weight: 700; color: var(--on-surface); margin: 0 0 12px;
+}
+.ptn-template-head {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 10px; margin-bottom: 12px;
+}
+.ptn-template-head h2 { margin: 0; }
+
+.ptn-lang-tabs {
+  display: inline-flex; gap: 2px; padding: 3px;
+  background: var(--surface-container-highest); border-radius: var(--radius-full);
+}
+.ptn-lang-tab {
+  font-size: 12.5px; font-weight: 600; font-family: inherit; cursor: pointer;
+  padding: 6px 15px; border-radius: var(--radius-full);
+  background: transparent; color: var(--on-surface-variant); border: 0;
+  transition: background var(--t-base), color var(--t-base);
+}
+.ptn-lang-tab:hover { color: var(--on-surface); }
+.ptn-lang-tab.is-active { background: #ffffff; color: var(--primary); box-shadow: var(--shadow-card); }
+
+.ptn-variant { margin-bottom: 1.5rem; }
+.ptn-variant h3 {
+  font-size: 14.5px; font-weight: 700; color: var(--on-surface); margin: 0 0 4px;
+}
+
+.ptn-problem-table td:last-child { color: var(--on-surface-variant); font-size: 13.5px; }
+.ptn-problem-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  color: var(--primary); font-weight: 600; text-decoration: none;
+}
+.ptn-problem-link:hover { text-decoration: underline; }
+.ptn-problem-link i { font-size: 13px; }
+.ptn-diff {
+  display: inline-block; font-size: 11.5px; font-weight: 700;
+  padding: 3px 9px; border-radius: var(--radius-full); white-space: nowrap;
+}
+.ptn-diff-easy   { background: var(--secondary-container); color: var(--on-secondary-container); }
+.ptn-diff-medium { background: #fef3e2; color: #633806; }
+.ptn-diff-hard   { background: var(--primary-container); color: var(--on-primary-container); }
+
+.ptn-pitfalls .lsn-callout { margin-bottom: 12px; }
+
+.ptn-related-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ptn-related-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 13px; font-weight: 600; text-decoration: none;
+  padding: 8px 14px; border-radius: var(--radius-full);
+  background: var(--surface-container); color: var(--on-surface-variant);
+  border: 1px solid var(--outline-variant);
+  transition: border-color var(--t-base), color var(--t-base);
+}
+.ptn-related-chip:hover { border-color: var(--primary); color: var(--primary); }
+.ptn-related-chip i { font-size: 14px; }
+
+@media (max-width: 640px) {
+  .ptn-filter-bar { flex-direction: column; align-items: stretch; }
+  .ptn-cat-chips { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+  .ptn-cat-chip { flex-shrink: 0; }
+  .ptn-template-head { flex-direction: column; align-items: flex-start; }
+  .ptn-triggers { padding: 15px 16px; }
+}

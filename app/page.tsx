@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { problems } from '@/data/problems';
 import { weeks } from '@/data/weeks';
-import { patterns } from '@/data/patterns';
+import { PATTERN_COUNT } from '@/data/patterns/count';
 import PledgeModal from '@/components/PledgeModal';
 import DailyQuoteModal from '@/components/DailyQuoteModal';
 
@@ -570,7 +570,7 @@ export default function DashboardPage() {
           <div className="mini-icon-bento">
             <i className="ti ti-award" style={{ fontSize: '15px' }} aria-hidden="true"></i>
           </div>
-          <span className="mini-val-bento">{patterns.length}</span>
+          <span className="mini-val-bento">{PATTERN_COUNT}</span>
           <span className="mini-lbl-bento">Patterns</span>
         </div>
 
