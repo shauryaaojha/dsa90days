@@ -53,7 +53,9 @@ export const proxy = auth(async (request) => {
 });
 
 export const config = {
+  // `privacy` and `terms` are deliberately public: someone has to be able to
+  // read what they are agreeing to before they have an account to sign in with.
   matcher: [
-    '/((?!api/auth|api/register|login|register|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api/auth|api/register|login|register|privacy|terms|_next/static|_next/image|favicon.ico).*)',
   ],
 };

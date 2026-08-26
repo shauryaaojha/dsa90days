@@ -12,6 +12,7 @@ export default function Navbar() {
 
   const links = [
     { href: '/', label: 'Dashboard' },
+    { href: '/day0to1', label: 'Phase 0' },
     { href: '/phase/1', label: 'Phase 1' },
     { href: '/phase/2', label: 'Phase 2' },
     { href: '/patterns', label: 'Patterns' },
@@ -41,7 +42,15 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className={`nav-link-dock ${pathname === link.href ? 'active' : ''}`}
+              className={`nav-link-dock ${
+                link.href === '/'
+                  ? pathname === '/'
+                    ? 'active'
+                    : ''
+                  : pathname.startsWith(link.href)
+                    ? 'active'
+                    : ''
+              }`}
             >
               {link.label}
             </Link>

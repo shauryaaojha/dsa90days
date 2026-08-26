@@ -324,6 +324,12 @@ export default function RegisterPage() {
             Already have an account?{' '}
             <Link href="/login" className="auth-switch-link">Sign in</Link>
           </p>
+
+          <p className="auth-legal-text">
+            By creating an account you agree to our{' '}
+            <Link href="/terms" className="auth-legal-link">Terms</Link> and{' '}
+            <Link href="/privacy" className="auth-legal-link">Privacy Policy</Link>.
+          </p>
         </div>
       </div>
     </div>

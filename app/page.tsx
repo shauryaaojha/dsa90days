@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { problems } from '@/data/problems';
 import { weeks } from '@/data/weeks';
-import { patterns } from '@/data/patterns';
+import { PATTERN_COUNT } from '@/data/patterns/count';
 import PledgeModal from '@/components/PledgeModal';
 import DailyQuoteModal from '@/components/DailyQuoteModal';
 
@@ -15,6 +15,16 @@ interface DailyQuote {
   translation?: string;
   meaning: string;
   source: string;
+}
+
+interface TrackState {
+  track: 'phase0' | 'phase1' | null;
+  day0to1Language: 'cpp' | 'java' | 'python' | null;
+  day0to1CompletedAt: string | null;
+  /** When the 90-day clock started. Null while the student is on Phase 0. */
+  phase1StartedAt: string | null;
+  totalTopics: number;
+  completedCount: number;
 }
 
 interface ProgressEntry {
@@ -32,25 +42,19 @@ export default function DashboardPage() {
   const [pledgeLoading, setPledgeLoading] = useState(true);
   const [dailyQuote, setDailyQuote] = useState<DailyQuote | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [trackState, setTrackState] = useState<TrackState | null>(null);
+  const [trackLoading, setTrackLoading] = useState(true);
+  const router = useRouter();
 
+  // Onboarding order: pledge first, then pick a track. Sending an unpledged
+  // student to track selection would put the choice in front of the promise.
+  // `trackState` being null means the fetch failed — stay put rather than
+  // treating a network blip as "never onboarded".
   useEffect(() => {
-    if (session) {
-      fetchProgress();
-      fetchPledge();
-    } else if (status === 'unauthenticated') {
-      setLoading(false);
-      setPledgeLoading(false);
+    if (!pledgeLoading && !trackLoading && pledgeDate && trackState && !trackState.track) {
+      router.replace('/track-select');
     }
-  }, [session, status]);
-
-  useEffect(() => {
-    if (!pledgeLoading && pledgeDate) {
-      const today = new Date().toDateString();
-      if (localStorage.getItem('dsa_quote_date') !== today) {
-        fetchDailyQuote(today);
-      }
-    }
-  }, [pledgeLoading, pledgeDate]);
+  }, [pledgeLoading, trackLoading, pledgeDate, trackState, router]);
 
   const fetchDailyQuote = async (_today: string) => {
     try {
@@ -76,6 +80,22 @@ export default function DashboardPage() {
     }
   };
 
+  // Carries both the track choice and the Phase 0 headline numbers. A failure
+  // here hides the Phase 0 card rather than blocking the 90-day view, and
+  // deliberately does not bounce the student to track selection — a network
+  // blip should never look like "you never onboarded".
+  const fetchTrack = async () => {
+    try {
+      const res = await fetch('/api/track');
+      if (!res.ok) return;
+      setTrackState(await res.json());
+    } catch {
+      setTrackState(null);
+    } finally {
+      setTrackLoading(false);
+    }
+  };
+
   const fetchProgress = async () => {
     try {
       const res = await fetch('/api/progress');
@@ -87,6 +107,26 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (session) {
+      fetchProgress();
+      fetchPledge();
+      fetchTrack();
+    } else if (status === 'unauthenticated') {
+      setLoading(false);
+      setPledgeLoading(false);
+    }
+  }, [session, status]);
+
+  useEffect(() => {
+    if (!pledgeLoading && pledgeDate) {
+      const today = new Date().toDateString();
+      if (localStorage.getItem('dsa_quote_date') !== today) {
+        fetchDailyQuote(today);
+      }
+    }
+  }, [pledgeLoading, pledgeDate]);
 
   const toggleProblem = async (problemId: string, currentStatus: boolean) => {
     try {
@@ -134,7 +174,7 @@ export default function DashboardPage() {
     }
   };
 
-  if (status === 'loading' || (session && (loading || pledgeLoading))) {
+  if (status === 'loading' || (session && (loading || pledgeLoading || trackLoading))) {
     return (
       <div className="loading-spinner">
         <div className="spinner" />
@@ -156,6 +196,12 @@ export default function DashboardPage() {
   const phase1Completed = phase1Problems.filter((p) => completedIds.has(p.id)).length;
   const phase2Completed = phase2Problems.filter((p) => completedIds.has(p.id)).length;
 
+  const phase0Pct =
+    trackState && trackState.totalTopics > 0
+      ? Math.round((trackState.completedCount / trackState.totalTopics) * 100)
+      : 0;
+  const onPhase0Track = trackState?.track === 'phase0';
+
   const easyProblems = problems.filter((p) => p.difficulty === 'Easy');
   const mediumProblems = problems.filter((p) => p.difficulty === 'Medium');
   const hardProblems = problems.filter((p) => p.difficulty === 'Hard');
@@ -167,9 +213,14 @@ export default function DashboardPage() {
     problems.filter((p) => completedIds.has(p.id)).map((p) => p.day)
   );
 
-  // Calendar-based day counter — counts real days since pledge date
-  const todayDay = pledgeDate
-    ? Math.min(90, Math.max(1, Math.floor((Date.now() - new Date(pledgeDate).getTime()) / 86_400_000) + 1))
+  // Calendar-based day counter. The clock starts when the student enters
+  // Phase 1, not when they pledge — a student who spends three weeks on Phase 0
+  // should still land on Day 1 of the sprint. `phase1StartedAt` falls back to
+  // the pledge date server-side, so nobody who was already being counted from
+  // it loses their day number.
+  const clockStart = trackState?.phase1StartedAt ?? pledgeDate;
+  const todayDay = clockStart
+    ? Math.min(90, Math.max(1, Math.floor((Date.now() - new Date(clockStart).getTime()) / 86_400_000) + 1))
     : 1;
 
   // Today's questions list
@@ -519,7 +570,7 @@ export default function DashboardPage() {
           <div className="mini-icon-bento">
             <i className="ti ti-award" style={{ fontSize: '15px' }} aria-hidden="true"></i>
           </div>
-          <span className="mini-val-bento">{patterns.length}</span>
+          <span className="mini-val-bento">{PATTERN_COUNT}</span>
           <span className="mini-lbl-bento">Patterns</span>
         </div>
 
@@ -540,6 +591,38 @@ export default function DashboardPage() {
         </div>
 
         {/* 6. Phase Cards (span 2 each) */}
+        <div className={`bento-card card-phase-bento ${onPhase0Track ? 'card-premium-green' : ''}`}>
+          <div className="phase-header-bento">
+            <span className="phase-badge-bento p0-badge-bento">Phase 0</span>
+            <span className="phase-days-bento">{onPhase0Track ? 'Your track' : 'Before Day 1'}</span>
+          </div>
+          <div className="phase-title-bento">Language Foundation</div>
+          <div className="phase-sub-bento">C++ · Java · Python fundamentals</div>
+
+          <div className="phase-progress-row-bento">
+            <div className="phase-track-bento">
+              <div
+                className="p0-fill-bento"
+                style={{ width: `${phase0Pct}%` }}
+              />
+            </div>
+            <span className="phase-pct-bento p0-pct-bento">{phase0Pct}%</span>
+          </div>
+
+          <div className="phase-counts-bento">
+            {trackState && trackState.totalTopics > 0
+              ? `${trackState.completedCount} / ${trackState.totalTopics} topics`
+              : 'Pick a language to begin'}
+          </div>
+
+          <Link href="/day0to1" style={{ textDecoration: 'none' }}>
+            <button className="phase-btn-bento">
+              <i className="ti ti-book" style={{ fontSize: '13px' }} aria-hidden="true"></i>
+              {trackState && trackState.completedCount > 0 ? 'Continue Phase 0' : 'Start Phase 0'}
+            </button>
+          </Link>
+        </div>
+
         <div className="bento-card card-phase-bento card-premium-purple">
           <div className="phase-header-bento">
             <span className="phase-badge-bento p1-badge-bento">Phase 1</span>
