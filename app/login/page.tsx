@@ -192,6 +192,12 @@ export default function LoginPage() {
             New here?{' '}
             <Link href="/register" className="auth-switch-link">Create a free account</Link>
           </p>
+
+          <p className="auth-legal-text">
+            <Link href="/terms" className="auth-legal-link">Terms</Link>
+            {' · '}
+            <Link href="/privacy" className="auth-legal-link">Privacy Policy</Link>
+          </p>
         </div>
       </div>
     </div>

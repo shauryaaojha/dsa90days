@@ -2705,3 +2705,19 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   .ptn-template-head { flex-direction: column; align-items: flex-start; }
   .ptn-triggers { padding: 15px 16px; }
 }
+
+/* Legal links under the auth forms. Quieter than .auth-switch-text — this is
+   fine print, not a call to action. */
+.auth-legal-text {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+.auth-legal-link {
+  color: var(--text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.auth-legal-link:hover { color: var(--primary); }
