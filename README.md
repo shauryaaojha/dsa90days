@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DSA 90 Days
 
-## Getting Started
+A 90-day Data Structures & Algorithms study tracker. Students register, pick a language track, pledge to the plan, and work through phases, patterns and a Day 0→1 primer while their progress is tracked; an admin panel manages users, quotes and analytics.
 
-First, run the development server:
+**Stack:** Next.js (App Router) · React · TypeScript · MongoDB / Mongoose · NextAuth (Auth.js) · bcryptjs
+
+## Features
+
+- **Auth** — register/login with hashed passwords; separate admin login.
+- **Track select** — choose the C++ / Java / Python track.
+- **Day 0→1** — beginner lessons per topic (`/day0to1/[topicId]`).
+- **Phases** — the 90-day plan split into phases (`/phase/[id]`), sourced from `DSA_90Day_Study_Plan.xlsx` → `data/`.
+- **Patterns** — problem-solving pattern library (`/patterns/[slug]`).
+- **Progress tracking** — `/api/progress`, `/api/track`, `/api/pledge`, `/api/profile`.
+- **Admin** — users, quotes and analytics dashboards under `/admin`.
+- Resources, privacy and terms pages.
+
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+# .env.local: MONGODB_URI, AUTH_SECRET, NEXTAUTH_URL
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Layout
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+app/            routes (admin, day0to1, patterns, phase, profile, api/*)
+components/     UI
+data/           study plan, patterns, lessons
+models/         Mongoose schemas
+lib/            db + helpers
+auth.ts         Auth.js config
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Design tokens live in [`DESIGN.md`](DESIGN.md).
