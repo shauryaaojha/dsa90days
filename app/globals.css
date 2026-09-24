@@ -118,7 +118,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   border-bottom: 1px solid var(--outline-variant);
 }
 .navbar-dock {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
   max-width: 1100px; margin: 0 auto;
   padding: 0 1.5rem;
   height: 60px;
@@ -140,26 +140,82 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .nav-links-dock { display: flex; align-items: center; gap: 2px; }
 .nav-link-dock {
   font-size: 14px; font-weight: 500; color: var(--on-surface-variant);
-  padding: 7px 14px; border-radius: var(--radius);
+  padding: 7px 13px; border-radius: var(--radius);
   transition: color var(--t-fast), background var(--t-fast);
+  text-decoration: none; white-space: nowrap;
 }
 .nav-link-dock:hover { color: var(--on-surface); background: var(--surface-container-low); }
 .nav-link-dock.active { color: var(--primary); background: var(--primary-container); font-weight: 600; }
+.nav-group-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  font: inherit; font-size: 14px; font-weight: 500; background: transparent; border: none; cursor: pointer;
+}
+.nav-group-btn .ti-chevron-down { font-size: 13px; transition: transform var(--t-fast); }
+.nav-group.open .nav-group-btn .ti-chevron-down { transform: rotate(180deg); }
+.nav-group.open > .nav-group-btn { color: var(--on-surface); background: var(--surface-container-low); }
+.nav-group.open > .nav-group-btn.active { color: var(--primary); background: var(--primary-container); }
+
+/* Dropdown menus (desktop) */
+.nav-group { position: relative; }
+.nav-menu {
+  position: absolute; top: calc(100% + 6px); left: 0; min-width: 250px;
+  background: #fff; border: 1px solid var(--outline-variant); border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(148, 69, 33, 0.14);
+  padding: 6px; display: none; flex-direction: column; gap: 2px; z-index: 110;
+}
+.nav-menu::before { content: ''; position: absolute; left: 0; right: 0; top: -8px; height: 8px; }
+.nav-group.open > .nav-menu { display: flex; }
+.nav-menu-right { left: auto; right: 0; }
+.nav-menu-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+  padding: 9px 10px; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 600;
+  color: var(--on-surface); text-decoration: none; background: transparent; border: none; cursor: pointer;
+  transition: background var(--t-fast);
+}
+.nav-menu-item > .ti { font-size: 17px; color: var(--on-surface-variant); flex: 0 0 auto; }
+.nav-menu-item > span { display: flex; flex-direction: column; line-height: 1.2; flex: 1; }
+.nav-menu-item small { font-size: 11.5px; font-weight: 500; color: var(--outline); margin-top: 2px; }
+.nav-menu-item:hover { background: var(--surface-container-low); }
+.nav-menu-item.active { background: var(--primary-container); color: var(--primary); }
+.nav-menu-item.active > .ti { color: var(--primary); }
+.nav-menu-who { padding: 8px 10px 10px; border-bottom: 1px solid var(--outline-variant); margin-bottom: 4px; display: flex; flex-direction: column; }
+.nav-menu-who strong { font-size: 14px; color: var(--on-surface); }
+.nav-menu-who small { font-size: 12px; color: var(--outline); overflow: hidden; text-overflow: ellipsis; }
+
+/* User area */
 .nav-user-dock { display: flex; align-items: center; gap: 8px; }
 .avatar-dock {
   width: 34px; height: 34px; border-radius: var(--radius-full);
   background: var(--primary); color: var(--on-primary);
-  font-size: 13px; font-weight: 700;
+  font: inherit; font-size: 13px; font-weight: 700; border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   text-decoration: none; transition: box-shadow var(--t-fast);
 }
-.avatar-dock:hover { box-shadow: 0 0 0 3px var(--primary-container); }
-.btn-logout-dock {
-  font-size: 13px; font-weight: 500; color: var(--on-surface-variant);
-  border: 1px solid var(--outline-variant); border-radius: var(--radius);
-  padding: 6px 14px; transition: all var(--t-fast);
+.avatar-dock:hover, .nav-user-group.open .avatar-dock { box-shadow: 0 0 0 3px var(--primary-container); }
+.nav-burger {
+  display: none; width: 38px; height: 38px; border-radius: var(--radius);
+  border: 1px solid var(--outline-variant); background: #fff; color: var(--on-surface);
+  font-size: 20px; align-items: center; justify-content: center; cursor: pointer;
 }
-.btn-logout-dock:hover { color: var(--primary); border-color: var(--primary); background: var(--primary-container); }
+
+/* Mobile panel */
+.nav-mobile {
+  width: min(1100px, 94vw); margin: 0 auto; padding: 8px 1rem 16px;
+  display: flex; flex-direction: column; gap: 6px;
+  border-top: 1px solid var(--outline-variant);
+  max-height: calc(100vh - 60px); overflow-y: auto;
+}
+.nav-mobile-group { padding-top: 6px; }
+.nav-mobile-title {
+  display: flex; align-items: center; gap: 6px; padding: 8px 10px 4px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--outline);
+}
+
+@media (max-width: 900px) {
+  .nav-links-dock { display: none; }
+  .nav-user-group { display: none; }
+  .nav-burger { display: inline-flex; }
+}
 
 /* ─── Page Header ────────────────────────────────────────────────────────────── */
 .bento-header-wrapper {
@@ -1281,8 +1337,6 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 
 @media (max-width: 576px) {
-  /* Navbar */
-  .nav-links-dock { display: none; }
   /* Dashboard */
   .bento-grid { grid-template-columns: 1fr; }
   .card-hero-bento, .card-streak-bento, .card-diff-bento,
@@ -2721,3 +2775,19 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   text-underline-offset: 2px;
 }
 .auth-legal-link:hover { color: var(--primary); }
+
+/* Themed scrollbar for scrolling cards (daily quote, mobile menu) */
+.dq-card, .nav-mobile {
+  scrollbar-width: thin;
+  scrollbar-color: #dbb8a6 transparent;
+}
+.dq-card::-webkit-scrollbar, .nav-mobile::-webkit-scrollbar { width: 8px; height: 8px; }
+.dq-card::-webkit-scrollbar-track, .nav-mobile::-webkit-scrollbar-track {
+  background: transparent; margin: 14px 0;
+}
+.dq-card::-webkit-scrollbar-thumb, .nav-mobile::-webkit-scrollbar-thumb {
+  background: #dbb8a6; border-radius: 999px; border: 2px solid #fffaf8;
+}
+.dq-card::-webkit-scrollbar-thumb:hover, .nav-mobile::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
