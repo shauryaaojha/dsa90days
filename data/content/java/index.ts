@@ -1,4 +1,5 @@
 import type { Lesson } from '../types';
+import { sharedLessonsFor } from '../shared';
 import { ch01 } from './ch01';
 import { ch02 } from './ch02';
 import { ch03 } from './ch03';
@@ -16,6 +17,10 @@ import { ch14 } from './ch14';
 import { ch15 } from './ch15';
 import { ch16 } from './ch16';
 import { ch17 } from './ch17';
+import { ch43 } from './ch43';
+import { ch19 } from './ch19';
+import { ch29 } from './ch29';
+import { ch44 } from './ch44';
 
 /**
  * All Java Phase 0 lessons, in chapter order.
@@ -42,4 +47,10 @@ export const javaLessons: Lesson[] = [
   ...ch15,
   ...ch16,
   ...ch17,
+  ...ch43,
+  ...ch19,
+  ...ch29,
+  ...ch44,
+  // Expansion chapters authored once for all languages (data/content/shared).
+  ...sharedLessonsFor('java'),
 ];

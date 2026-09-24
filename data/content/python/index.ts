@@ -1,4 +1,5 @@
 import type { Lesson } from '../types';
+import { sharedLessonsFor } from '../shared';
 import { ch01 } from './ch01';
 import { ch02 } from './ch02';
 import { ch03 } from './ch03';
@@ -14,6 +15,10 @@ import { ch12 } from './ch12';
 import { ch13 } from './ch13';
 import { ch14 } from './ch14';
 import { ch15 } from './ch15';
+import { ch41 } from './ch41';
+import { ch17 } from './ch17';
+import { ch27 } from './ch27';
+import { ch42 } from './ch42';
 
 /**
  * All Python Phase 0 lessons, in chapter order.
@@ -38,4 +43,10 @@ export const pythonLessons: Lesson[] = [
   ...ch13,
   ...ch14,
   ...ch15,
+  ...ch41,
+  ...ch17,
+  ...ch27,
+  ...ch42,
+  // Expansion chapters authored once for all languages (data/content/shared).
+  ...sharedLessonsFor('python'),
 ];

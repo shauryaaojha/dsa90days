@@ -1,9 +1,12 @@
 export type Phase0Language = 'cpp' | 'java' | 'python';
 
+import { newChapters, newChapterNumber, topicsFor, chapterOrder } from './phase0Expansion';
+
 export interface Day0to1Chapter {
-  chapter: number;
+  chapter: number;           // stable id, part of every topic id — never renumbered
   title: string;
   language: Phase0Language;
+  ordinal: number;           // 1-based position on screen (see phase0Expansion.chapterOrder)
 }
 
 export interface Day0to1Topic {
@@ -13,12 +16,13 @@ export interface Day0to1Topic {
   chapterTitle: string;      // "Language Setup and Core Syntax"
   subIndex: number;          // 1, 2, 3…
   title: string;             // "C++ program structure"
+  displayChapter: number;    // the chapter's ordinal, for "7.3"-style labels
 }
 
 // ---------------------------------------------------------------------------
-// C++ — 20 chapters (ch 20 is a goal summary, not topics → 19 trackable chapters)
+// C++ — original syllabus, chapters 1–19 (frozen; ids 20+ belong to phase0Expansion.ts)
 // ---------------------------------------------------------------------------
-const cppChapters: Day0to1Chapter[] = [
+const cppChapters: Omit<Day0to1Chapter, 'ordinal'>[] = [
   { chapter: 1, title: 'Language Setup and Core Syntax', language: 'cpp' },
   { chapter: 2, title: 'Variables, Data Types, and Operators', language: 'cpp' },
   { chapter: 3, title: 'Control Flow', language: 'cpp' },
@@ -40,7 +44,7 @@ const cppChapters: Day0to1Chapter[] = [
   { chapter: 19, title: 'LeetCode Readiness Checklist', language: 'cpp' },
 ];
 
-const cppTopics: Omit<Day0to1Topic, 'chapterTitle'>[] = [
+const cppTopics: Omit<Day0to1Topic, 'chapterTitle' | 'displayChapter'>[] = [
   // Chapter 1
   { id: 'cpp-1.1', language: 'cpp', chapter: 1, subIndex: 1, title: 'C++ program structure' },
   { id: 'cpp-1.2', language: 'cpp', chapter: 1, subIndex: 2, title: '#include directives' },
@@ -229,9 +233,9 @@ const cppTopics: Omit<Day0to1Topic, 'chapterTitle'>[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Java — 18 chapters (ch 18 is a goal summary → 17 trackable chapters)
+// Java — original syllabus, chapters 1–17 (frozen; ids 18+ belong to phase0Expansion.ts)
 // ---------------------------------------------------------------------------
-const javaChapters: Day0to1Chapter[] = [
+const javaChapters: Omit<Day0to1Chapter, 'ordinal'>[] = [
   { chapter: 1, title: 'Java Setup and Core Syntax', language: 'java' },
   { chapter: 2, title: 'Variables, Data Types, and Operators', language: 'java' },
   { chapter: 3, title: 'Control Flow', language: 'java' },
@@ -251,7 +255,7 @@ const javaChapters: Day0to1Chapter[] = [
   { chapter: 17, title: 'LeetCode Readiness Checklist', language: 'java' },
 ];
 
-const javaTopics: Omit<Day0to1Topic, 'chapterTitle'>[] = [
+const javaTopics: Omit<Day0to1Topic, 'chapterTitle' | 'displayChapter'>[] = [
   // Chapter 1
   { id: 'java-1.1', language: 'java', chapter: 1, subIndex: 1, title: 'Java program structure' },
   { id: 'java-1.2', language: 'java', chapter: 1, subIndex: 2, title: 'class and main()' },
@@ -435,9 +439,9 @@ const javaTopics: Omit<Day0to1Topic, 'chapterTitle'>[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Python — 16 chapters (ch 16 is a goal summary → 15 trackable chapters)
+// Python — original syllabus, chapters 1–15 (frozen; ids 16+ belong to phase0Expansion.ts)
 // ---------------------------------------------------------------------------
-const pythonChapters: Day0to1Chapter[] = [
+const pythonChapters: Omit<Day0to1Chapter, 'ordinal'>[] = [
   { chapter: 1, title: 'Python Setup and Core Syntax', language: 'python' },
   { chapter: 2, title: 'Data Types, Operators, and Control Flow', language: 'python' },
   { chapter: 3, title: 'Functions', language: 'python' },
@@ -455,7 +459,7 @@ const pythonChapters: Day0to1Chapter[] = [
   { chapter: 15, title: 'Python-Specific LeetCode Readiness', language: 'python' },
 ];
 
-const pythonTopics: Omit<Day0to1Topic, 'chapterTitle'>[] = [
+const pythonTopics: Omit<Day0to1Topic, 'chapterTitle' | 'displayChapter'>[] = [
   // Chapter 1
   { id: 'python-1.1', language: 'python', chapter: 1, subIndex: 1, title: 'Python program structure' },
   { id: 'python-1.2', language: 'python', chapter: 1, subIndex: 2, title: 'Indentation and blocks' },
@@ -623,42 +627,90 @@ const pythonTopics: Omit<Day0to1Topic, 'chapterTitle'>[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Merge helpers
+// Assembly
 // ---------------------------------------------------------------------------
+//
+// The arrays above are the original syllabus and are frozen: their chapter
+// numbers are baked into topic ids and therefore into student progress rows.
+// Everything added since lives in phase0Expansion.ts. Here the two are merged
+// and put into on-screen order.
 
-function attachChapterTitles(
-  topics: Omit<Day0to1Topic, 'chapterTitle'>[],
-  chapters: Day0to1Chapter[],
-): Day0to1Topic[] {
-  const chapterMap = new Map(chapters.map((c) => [`${c.language}-${c.chapter}`, c.title]));
-  return topics.map((t) => ({
-    ...t,
-    chapterTitle: chapterMap.get(`${t.language}-${t.chapter}`) ?? '',
-  }));
+type ChapterSeed = Omit<Day0to1Chapter, 'ordinal'>;
+type TopicSeed = Omit<Day0to1Topic, 'chapterTitle' | 'displayChapter'>;
+
+function newChapterSeeds(language: Phase0Language): { chapters: ChapterSeed[]; topics: TopicSeed[] } {
+  const chapters: ChapterSeed[] = [];
+  const topics: TopicSeed[] = [];
+  newChapters.forEach((def, i) => {
+    const chapter = newChapterNumber(language, i);
+    const titles = topicsFor(def, language);
+    chapters.push({ chapter, title: def.title, language });
+    titles.forEach((title, j) => {
+      topics.push({ id: `${language}-${chapter}.${j + 1}`, language, chapter, subIndex: j + 1, title });
+    });
+  });
+  return { chapters, topics };
 }
 
-/** All Phase 0 topics across all three languages. */
+function assemble(
+  language: Phase0Language,
+  originalChapters: ChapterSeed[],
+  originalTopics: TopicSeed[],
+): { chapters: Day0to1Chapter[]; topics: Day0to1Topic[] } {
+  const added = newChapterSeeds(language);
+  const byNumber = new Map<number, ChapterSeed>(
+    [...originalChapters, ...added.chapters].map((c) => [c.chapter, c]),
+  );
+  const order = chapterOrder[language];
+
+  const chapters: Day0to1Chapter[] = order.map((n, i) => {
+    const seed = byNumber.get(n);
+    if (!seed) throw new Error(`chapterOrder.${language} names chapter ${n}, which does not exist`);
+    return { ...seed, ordinal: i + 1 };
+  });
+  if (chapters.length !== byNumber.size) {
+    throw new Error(`chapterOrder.${language} lists ${chapters.length} chapters but ${byNumber.size} are defined`);
+  }
+
+  const ordinalOf = new Map(chapters.map((c) => [c.chapter, c.ordinal]));
+  const titleOf = new Map(chapters.map((c) => [c.chapter, c.title]));
+  const allTopics = [...originalTopics, ...added.topics];
+  const topics: Day0to1Topic[] = chapters.flatMap((c) =>
+    allTopics
+      .filter((t) => t.chapter === c.chapter)
+      .map((t) => ({ ...t, chapterTitle: titleOf.get(t.chapter) ?? '', displayChapter: ordinalOf.get(t.chapter) ?? 0 })),
+  );
+  return { chapters, topics };
+}
+
+const assembled: Record<Phase0Language, ReturnType<typeof assemble>> = {
+  cpp: assemble('cpp', cppChapters, cppTopics),
+  java: assemble('java', javaChapters, javaTopics),
+  python: assemble('python', pythonChapters, pythonTopics),
+};
+
+/** All Phase 0 topics across all three languages, in on-screen order. */
 export const day0to1Topics: Day0to1Topic[] = [
-  ...attachChapterTitles(cppTopics, cppChapters),
-  ...attachChapterTitles(javaTopics, javaChapters),
-  ...attachChapterTitles(pythonTopics, pythonChapters),
+  ...assembled.cpp.topics,
+  ...assembled.java.topics,
+  ...assembled.python.topics,
 ];
 
-/** All chapters across all three languages. */
+/** All chapters across all three languages, in on-screen order. */
 export const day0to1Chapters: Day0to1Chapter[] = [
-  ...cppChapters,
-  ...javaChapters,
-  ...pythonChapters,
+  ...assembled.cpp.chapters,
+  ...assembled.java.chapters,
+  ...assembled.python.chapters,
 ];
 
-/** Get topics filtered by language. */
+/** Topics for a language, in the order a student should read them. */
 export function getTopicsForLanguage(language: Phase0Language): Day0to1Topic[] {
-  return day0to1Topics.filter((t) => t.language === language);
+  return assembled[language].topics;
 }
 
-/** Get chapters filtered by language. */
+/** Chapters for a language, in on-screen order. */
 export function getChaptersForLanguage(language: Phase0Language): Day0to1Chapter[] {
-  return day0to1Chapters.filter((c) => c.language === language);
+  return assembled[language].chapters;
 }
 
 /** Look up a single topic by its id, e.g. "cpp-1.1". */

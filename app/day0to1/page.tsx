@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getTopicsForLanguage, getChaptersForLanguage, languageMeta } from '@/data/day0to1Topics';
 import type { Day0to1Topic, Day0to1Chapter, Phase0Language } from '@/data/day0to1Topics';
-// Ids only — importing hasLesson from '@/data/content' would pull all 478
-// lesson bodies (1.7MB) into this Client Component's bundle.
+// Ids only — importing hasLesson from '@/data/content' would pull every
+// lesson body (megabytes) into this Client Component's bundle.
 import { hasLessonId } from '@/data/content/lessonIds';
 
 interface ProgressEntry {
@@ -29,10 +29,9 @@ const LANGUAGE_COLORS: Record<Phase0Language, string> = {
  * (168/164/147) were wrong for all three languages, and the landing page
  * already derives its figures for exactly this reason.
  *
- * `lessons` is what makes the choice honest: all 478 topics have written
- * lessons today, but the count is derived rather than asserted so a language
- * added with partial coverage says so on the card instead of surprising the
- * student with a "coming soon" placeholder after they commit.
+ * `lessons` is what makes the choice honest: the count is derived rather than
+ * asserted, so a language with partial coverage says so on the card instead of
+ * surprising the student with a "coming soon" placeholder after they commit.
  */
 const LANGUAGE_CARDS = LANGUAGES.map((key) => {
   const topics = getTopicsForLanguage(key);
@@ -444,7 +443,7 @@ export default function Phase0Dashboard() {
                 onClick={() => setExpandedChapter(isExpanded ? null : ch.chapter)}
               >
                 <div className="p0-chapter-left">
-                  <span className="p0-chapter-num">{ch.chapter}</span>
+                  <span className="p0-chapter-num">{ch.ordinal}</span>
                   <div className="p0-chapter-info">
                     <h3 className="p0-chapter-title">{ch.title}</h3>
                     <span className="p0-chapter-count">
@@ -489,7 +488,7 @@ export default function Phase0Dashboard() {
                         </button>
                         <Link href={`/day0to1/${topic.id}`} className="p0-topic-info">
                           <span className="p0-topic-label">
-                            {topic.chapter}.{topic.subIndex}
+                            {topic.displayChapter}.{topic.subIndex}
                           </span>
                           <span className="p0-topic-title">{topic.title}</span>
                           {hasLessonId(topic.id) ? (

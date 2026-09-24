@@ -1,4 +1,5 @@
 import type { Lesson } from '../types';
+import { sharedLessonsFor } from '../shared';
 import { ch01 } from './ch01';
 import { ch02 } from './ch02';
 import { ch03 } from './ch03';
@@ -18,6 +19,10 @@ import { ch16 } from './ch16';
 import { ch17 } from './ch17';
 import { ch18 } from './ch18';
 import { ch19 } from './ch19';
+import { ch45 } from './ch45';
+import { ch21 } from './ch21';
+import { ch31 } from './ch31';
+import { ch46 } from './ch46';
 
 /**
  * All C++ Phase 0 lessons, in chapter order.
@@ -46,4 +51,10 @@ export const cppLessons: Lesson[] = [
   ...ch17,
   ...ch18,
   ...ch19,
+  ...ch45,
+  ...ch21,
+  ...ch31,
+  ...ch46,
+  // Expansion chapters authored once for all languages (data/content/shared).
+  ...sharedLessonsFor('cpp'),
 ];

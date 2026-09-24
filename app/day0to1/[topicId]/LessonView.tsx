@@ -233,7 +233,7 @@ export default function LessonView({ topicId, topic, lesson, prev, next }: Lesso
   }
 
   const meta = languageMeta[topic.language];
-  const number = `${topic.chapter}.${topic.subIndex}`;
+  const number = `${topic.displayChapter}.${topic.subIndex}`;
   const otherLanguage = myLanguage && myLanguage !== topic.language ? myLanguage : null;
 
   return (
@@ -245,7 +245,7 @@ export default function LessonView({ topicId, topic, lesson, prev, next }: Lesso
           </Link>
           <span className="lsn-crumb">
             <i className={`ti ${meta.icon}`} />
-            {meta.name} · Chapter {topic.chapter} — {topic.chapterTitle}
+            {meta.name} · Chapter {topic.displayChapter} — {topic.chapterTitle}
           </span>
         </div>
       </header>
@@ -283,7 +283,7 @@ export default function LessonView({ topicId, topic, lesson, prev, next }: Lesso
                 <i className="ti ti-clock" /> {lesson.readMinutes} min read
               </span>
               <span>
-                <i className="ti ti-book-2" /> Chapter {topic.chapter}
+                <i className="ti ti-book-2" /> Chapter {topic.displayChapter}
               </span>
             </div>
 
